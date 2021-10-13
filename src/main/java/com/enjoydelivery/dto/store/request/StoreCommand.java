@@ -1,12 +1,10 @@
-package com.enjoydelivery.dto.request;
+package com.enjoydelivery.dto.store.request;
 
 import com.enjoydelivery.entity.Store;
-import java.time.LocalDateTime;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @NoArgsConstructor

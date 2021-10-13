@@ -1,4 +1,4 @@
-package com.enjoydelivery.dto.response;
+package com.enjoydelivery.dto.store.response;
 
 import com.enjoydelivery.entity.Menu;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.enjoydelivery.dto.response;
+package com.enjoydelivery.dto.store.response;
 
 import com.enjoydelivery.entity.Store;
 import java.util.stream.Collectors;

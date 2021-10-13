@@ -1,7 +1,6 @@
 package com.enjoydelivery.entity;
 
-import com.enjoydelivery.dto.request.StoreCommand;
-import java.time.LocalDateTime;
+import com.enjoydelivery.dto.store.request.StoreCommand;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
