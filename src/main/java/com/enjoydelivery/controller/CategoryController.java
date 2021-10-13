@@ -1,7 +1,7 @@
 package com.enjoydelivery.controller;
 
-import com.enjoydelivery.dto.request.CategoryCommand;
-import com.enjoydelivery.dto.response.ReadCategoryCommand;
+import com.enjoydelivery.dto.category.request.CategoryCommand;
+import com.enjoydelivery.dto.category.response.ReadCategoryCommand;
 import com.enjoydelivery.entity.Category;
 import com.enjoydelivery.service.CategoryService;
 import java.util.List;

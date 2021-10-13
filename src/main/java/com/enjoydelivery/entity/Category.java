@@ -1,6 +1,6 @@
 package com.enjoydelivery.entity;
 
-import com.enjoydelivery.dto.request.CategoryCommand;
+import com.enjoydelivery.dto.category.request.CategoryCommand;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

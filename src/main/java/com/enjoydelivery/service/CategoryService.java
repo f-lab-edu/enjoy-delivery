@@ -1,6 +1,6 @@
 package com.enjoydelivery.service;
 
-import com.enjoydelivery.dto.request.CategoryCommand;
+import com.enjoydelivery.dto.category.request.CategoryCommand;
 import com.enjoydelivery.entity.Category;
 import com.enjoydelivery.repository.CategoryRepository;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.enjoydelivery.dto.request;
+package com.enjoydelivery.dto.category.request;
 
 import com.enjoydelivery.entity.Category;
 import javax.validation.constraints.NotNull;
