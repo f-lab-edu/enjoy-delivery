@@ -1,8 +1,8 @@
 package com.enjoydelivery.controller;
 
-import com.enjoydelivery.dto.request.StoreCommand;
-import com.enjoydelivery.dto.response.ReadStoreCommand;
-import com.enjoydelivery.dto.response.ReadStoreListCommand;
+import com.enjoydelivery.dto.store.request.StoreCommand;
+import com.enjoydelivery.dto.store.response.ReadStoreCommand;
+import com.enjoydelivery.dto.store.response.ReadStoreListCommand;
 import com.enjoydelivery.entity.Store;
 import com.enjoydelivery.service.StoreService;
 import java.util.List;

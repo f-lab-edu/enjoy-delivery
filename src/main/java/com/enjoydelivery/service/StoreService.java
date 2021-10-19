@@ -1,6 +1,6 @@
 package com.enjoydelivery.service;
 
-import com.enjoydelivery.dto.request.StoreCommand;
+import com.enjoydelivery.dto.store.request.StoreCommand;
 import com.enjoydelivery.entity.Category;
 import com.enjoydelivery.entity.Store;
 import com.enjoydelivery.repository.StoreRepository;
