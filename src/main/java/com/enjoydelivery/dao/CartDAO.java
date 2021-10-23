@@ -2,12 +2,17 @@ package com.enjoydelivery.dao;
 
 import com.enjoydelivery.entity.OrderItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
@@ -36,37 +41,78 @@ public class CartDAO {
     String key = generateKey(userId);
     String hashKey = generateHashKey(userId, storeId);
 
-    redisTemplate.opsForValue().set(key, storeId);
-    redisTemplate.opsForHash().put(hashKey, orderItem.getMenu().getId()+"", orderItem);
-
+    List<Object> txResults = redisTemplate.execute(new SessionCallback<List<Object>>() {
+      public List<Object> execute(RedisOperations operations) throws DataAccessException {
+        operations.multi();
+        operations.opsForValue().set(key, storeId);
+        operations.opsForHash().put(hashKey, orderItem.getMenu().getId()+"", orderItem);
+        return operations.exec();
+      }
+    });
   }
+
 
   public void deleteAll(Long userId) {
     String key = generateKey(userId);
     String hashKey = getHashKey(userId);
-    redisTemplate.delete(hashKey);
-    redisTemplate.delete(key);
+
+    List<Object> txResults = redisTemplate.execute(new SessionCallback<List<Object>>() {
+      public List<Object> execute(RedisOperations operations) throws DataAccessException {
+        operations.multi();
+
+        ScanOptions scanOptions = ScanOptions.scanOptions().match("*").count(100).build();
+        Cursor cursor = operations.opsForHash().scan(hashKey, scanOptions);
+        String[] fields = new String[operations.opsForHash().size(hashKey).intValue()];
+        int i = 0;
+        while(cursor.hasNext()) {
+          Object o = cursor.next();
+          String str = objectMapper.convertValue(o, String.class);
+          fields[i++] = str;
+        }
+        operations.opsForHash().delete(hashKey, fields);
+
+        operations.delete(hashKey);
+        operations.delete(key);
+
+        return operations.exec();
+      }
+    });
   }
 
 
-  public void deleteOneOrderItem(Long menuId, Long userId) {
+ public void deleteOneOrderItem(Long menuId, Long userId) {
     String hashKey = getHashKey(userId);
     String key = generateKey(userId);
-    redisTemplate.opsForHash().delete(hashKey, menuId+"");
-    if (redisTemplate.opsForHash().size(hashKey) == 0) {
-      redisTemplate.delete(hashKey);
-      redisTemplate.delete(key);
-    }
+
+   List<Object> txResults = redisTemplate.execute(new SessionCallback<List<Object>>() {
+     public List<Object> execute(RedisOperations operations) throws DataAccessException {
+       operations.multi();
+
+       operations.opsForHash().delete(hashKey, menuId+"");
+       if (operations.opsForHash().size(hashKey) == 0) {
+         operations.delete(hashKey);
+         operations.delete(key);
+       }
+
+       return operations.exec();
+     }
+   });
 
   }
 
   public List<OrderItem> findAllByUserId(Long userId) {
-    String key = getHashKey(userId);
 
-    List<Object> values = redisTemplate.opsForHash().values(key);
-    return values.stream()
-        .map(o -> objectMapper.convertValue(o, OrderItem.class))
-        .collect(Collectors.toList());
+    String key = getHashKey(userId);
+    List<OrderItem> result = new ArrayList<>();
+    ScanOptions scanOptions = ScanOptions.scanOptions().match("*").count(100).build();
+    Cursor cursor = redisTemplate.opsForHash().scan(key, scanOptions);
+    while(cursor.hasNext()) {
+      Object o = cursor.next();
+      OrderItem oi = objectMapper.convertValue(o, OrderItem.class);
+      result.add(oi);
+    }
+
+    return result;
   }
 
   public Long findStoreIdByUserId(Long userId) {
