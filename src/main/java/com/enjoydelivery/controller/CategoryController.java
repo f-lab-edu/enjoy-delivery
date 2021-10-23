@@ -1,7 +1,7 @@
 package com.enjoydelivery.controller;
 
-import com.enjoydelivery.dto.category.request.CategoryCommand;
-import com.enjoydelivery.dto.category.response.ReadCategoryCommand;
+import com.enjoydelivery.dto.category.request.CategoryRequestDTO;
+import com.enjoydelivery.dto.category.response.ReadCategoryResponseDTO;
 import com.enjoydelivery.entity.Category;
 import com.enjoydelivery.service.CategoryService;
 import java.util.List;
@@ -27,28 +27,28 @@ public class CategoryController {
   private final CategoryService categoryService;
 
   @GetMapping
-  public ResponseEntity<List<ReadCategoryCommand>> readAll() {
+  public ResponseEntity<List<ReadCategoryResponseDTO>> readAll() {
     List<Category> categories = categoryService.readAll();
 
-    List<ReadCategoryCommand> results = categories.stream()
-        .map(category -> new ReadCategoryCommand(category))
+    List<ReadCategoryResponseDTO> results = categories.stream()
+        .map(category -> new ReadCategoryResponseDTO(category))
         .collect(Collectors.toList());
 
     return new ResponseEntity<>(results, HttpStatus.OK);
   }
 
   @PostMapping
-  public ResponseEntity create(@RequestBody @Valid CategoryCommand categoryCommand) {
-    categoryService.create(categoryCommand);
+  public ResponseEntity create(@RequestBody @Valid CategoryRequestDTO categoryRequestDTO) {
+    categoryService.create(categoryRequestDTO);
 
     return new ResponseEntity(HttpStatus.OK);
   }
 
   @PutMapping("/{categoryId}/edit")
   public ResponseEntity update(@PathVariable("categoryId") @Valid Long categoryId,
-      @RequestBody @Valid CategoryCommand categoryCommand) {
+      @RequestBody @Valid CategoryRequestDTO categoryRequestDTO) {
 
-    categoryService.update(categoryId, categoryCommand);
+    categoryService.update(categoryId, categoryRequestDTO);
 
     return new ResponseEntity(HttpStatus.OK);
   }

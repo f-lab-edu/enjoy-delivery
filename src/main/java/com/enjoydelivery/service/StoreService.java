@@ -1,6 +1,6 @@
 package com.enjoydelivery.service;
 
-import com.enjoydelivery.dto.store.request.StoreCommand;
+import com.enjoydelivery.dto.store.request.StoreRequestDTO;
 import com.enjoydelivery.entity.Category;
 import com.enjoydelivery.entity.Store;
 import com.enjoydelivery.repository.StoreRepository;
@@ -31,16 +31,16 @@ public class StoreService {
         .orElseThrow(RuntimeException::new);
   }
 
-  public void create(StoreCommand storeCommand) {
-    Store store = storeCommand.toEntity();
+  public void create(StoreRequestDTO storeRequestDTO) {
+    Store store = storeRequestDTO.toEntity();
     if (!storeRepository.existsByName(store.getName())) {
       storeRepository.save(store);
     }
   }
 
   @Transactional
-  public void update(Long storeId, StoreCommand storeCommand) {
+  public void update(Long storeId, StoreRequestDTO storeRequestDTO) {
     Store findStore = readOneById(storeId);
-    findStore.update(storeCommand);
+    findStore.update(storeRequestDTO);
   }
 }

@@ -1,6 +1,6 @@
 package com.enjoydelivery.service;
 
-import com.enjoydelivery.dto.category.request.CategoryCommand;
+import com.enjoydelivery.dto.category.request.CategoryRequestDTO;
 import com.enjoydelivery.entity.Category;
 import com.enjoydelivery.repository.CategoryRepository;
 import java.util.List;
@@ -18,8 +18,8 @@ public class CategoryService {
     return categoryRepository.findAll();
   }
 
-  public void create(CategoryCommand categoryCommand) {
-    Category category = categoryCommand.toEntity();
+  public void create(CategoryRequestDTO categoryRequestDTO) {
+    Category category = categoryRequestDTO.toEntity();
 
     if (!categoryRepository.existsByName(category.getName())) {
       categoryRepository.save(category);
@@ -28,9 +28,9 @@ public class CategoryService {
   }
 
   @Transactional
-  public void update(Long categoryId, CategoryCommand updateCategoryCommand) {
+  public void update(Long categoryId, CategoryRequestDTO updateCategoryRequestDTO) {
     Category findCategory = readOneById(categoryId);
-    findCategory.update(updateCategoryCommand);
+    findCategory.update(updateCategoryRequestDTO);
   }
 
   public void delete(Long categoryId) {
