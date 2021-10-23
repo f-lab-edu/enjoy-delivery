@@ -1,6 +1,6 @@
 package com.enjoydelivery.dto.cart.request;
 
-import com.enjoydelivery.dto.store.response.ReadMenuCommand;
+import com.enjoydelivery.dto.store.response.ReadMenuResponseDTO;
 import com.enjoydelivery.entity.OrderItem;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,20 +10,20 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateOrderItemCommand {
+public class CreateOrderItemRequestDTO {
 
   @NotNull
   private Long userId;
   @NotNull
   private Long storeId;
   @NotNull
-  private ReadMenuCommand readMenuCommand;
+  private ReadMenuResponseDTO readMenuResponseDTO;
   @NotNull
   private int count;
 
   public OrderItem toEntity() {
     return OrderItem.builder()
-        .menu(readMenuCommand.toEntity())
+        .menu(readMenuResponseDTO.toEntity())
         .count(count)
         .build();
   }

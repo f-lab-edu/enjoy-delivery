@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReadCategoryCommand {
+public class ReadCategoryResponseDTO {
   private Long id;
   private String name;
 
-  public ReadCategoryCommand(Category category) {
+  public ReadCategoryResponseDTO(Category category) {
     this.id = category.getId();
     this.name = category.getName();
   }

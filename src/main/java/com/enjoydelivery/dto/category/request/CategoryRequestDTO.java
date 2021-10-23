@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryCommand {
+public class CategoryRequestDTO {
 
   @NotNull
   private String name;

@@ -1,6 +1,6 @@
 package com.enjoydelivery.dto.cart.response;
 
-import com.enjoydelivery.dto.store.response.ReadMenuCommand;
+import com.enjoydelivery.dto.store.response.ReadMenuResponseDTO;
 import com.enjoydelivery.entity.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderItemCommand {
+public class OrderItemResponseDTO {
 
-  private ReadMenuCommand menuCommand;
+  private ReadMenuResponseDTO menuCommand;
   private int count;
 
-  public OrderItemCommand(OrderItem orderItem) {
-    this.menuCommand = new ReadMenuCommand(orderItem.getMenu());
+  public OrderItemResponseDTO(OrderItem orderItem) {
+    this.menuCommand = new ReadMenuResponseDTO(orderItem.getMenu());
     this.count = orderItem.getCount();
   }
 }
