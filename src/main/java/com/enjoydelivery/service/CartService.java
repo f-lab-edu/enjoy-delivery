@@ -1,8 +1,8 @@
 package com.enjoydelivery.service;
 
 import com.enjoydelivery.dao.CartDAO;
-import com.enjoydelivery.dto.cart.request.CreateOrderItemCommand;
-import com.enjoydelivery.dto.cart.reseponse.ReadCartCommand;
+import com.enjoydelivery.dto.cart.request.CreateOrderItemRequestDTO;
+import com.enjoydelivery.dto.cart.response.ReadCartResponseDTO;
 import com.enjoydelivery.entity.OrderItem;
 import com.enjoydelivery.entity.Store;
 import java.util.List;
@@ -16,7 +16,7 @@ public class CartService {
   private final StoreService storeService;
   private final CartDAO cartDAO;
 
-  public void addOrderItem(CreateOrderItemCommand orderItemCommand) {
+  public void addOrderItem(CreateOrderItemRequestDTO orderItemCommand) {
     OrderItem orderItem = orderItemCommand.toEntity();
     Long storeId = orderItemCommand.getStoreId();
     Long userId = orderItemCommand.getUserId();
@@ -57,7 +57,7 @@ public class CartService {
     cartDAO.deleteAll(userId);
   }
 
-  public ReadCartCommand read(Long userId) {
+  public ReadCartResponseDTO read(Long userId) {
     List<OrderItem> orderItems = cartDAO.findAllByUserId(userId);
     Long storeId = cartDAO.findStoreIdByUserId(userId);
     if (isEmptyCart(storeId)) {
@@ -66,12 +66,12 @@ public class CartService {
 
     Store store = storeService.readOneById(storeId);
 
-    ReadCartCommand readCartCommand = new ReadCartCommand(
+    ReadCartResponseDTO readCartResponseDTO = new ReadCartResponseDTO(
         storeId,
         store.getName(),
         store.getDeliveryCost(),
         orderItems);
 
-    return readCartCommand;
+    return readCartResponseDTO;
   }
 }
