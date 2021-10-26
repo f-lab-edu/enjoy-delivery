@@ -1,8 +1,8 @@
 package com.enjoydelivery.controller;
 
-import com.enjoydelivery.dto.store.request.StoreCommand;
-import com.enjoydelivery.dto.store.response.ReadStoreCommand;
-import com.enjoydelivery.dto.store.response.ReadStoreListCommand;
+import com.enjoydelivery.dto.store.request.StoreRequestDTO;
+import com.enjoydelivery.dto.store.response.ReadStoreResponseDTO;
+import com.enjoydelivery.dto.store.response.ReadStoreListResponseDTO;
 import com.enjoydelivery.entity.Store;
 import com.enjoydelivery.service.StoreService;
 import java.util.List;
@@ -27,12 +27,12 @@ public class StoreController {
   private final StoreService storeService;
 
   @GetMapping("/category/{categoryId}")
-  public ResponseEntity<List<ReadStoreListCommand>> readByCategory(
+  public ResponseEntity<List<ReadStoreListResponseDTO>> readByCategory(
       @PathVariable @Valid Long categoryId) {
     List<Store> stores = storeService.readAllByCategory(categoryId);
 
-    List<ReadStoreListCommand> results = stores.stream()
-        .map(store -> new ReadStoreListCommand(store))
+    List<ReadStoreListResponseDTO> results = stores.stream()
+        .map(store -> new ReadStoreListResponseDTO(store))
         .collect(Collectors.toList());
 
     return new ResponseEntity<>(results, HttpStatus.OK);
@@ -42,23 +42,23 @@ public class StoreController {
   public ResponseEntity read(@PathVariable @Valid Long storeId) {
     Store store = storeService.readOneFetchJoinById(storeId);
 
-    ReadStoreCommand result = new ReadStoreCommand(store);
+    ReadStoreResponseDTO result = new ReadStoreResponseDTO(store);
 
     return new ResponseEntity(result, HttpStatus.OK);
   }
 
   @PostMapping
-  public ResponseEntity create(@RequestBody @Valid StoreCommand storeCommand) {
+  public ResponseEntity create(@RequestBody @Valid StoreRequestDTO storeRequestDTO) {
 
-    storeService.create(storeCommand);
+    storeService.create(storeRequestDTO);
 
     return new ResponseEntity(HttpStatus.OK);
   }
 
   @PutMapping("/{storeId}/edit")
   public ResponseEntity update(@PathVariable("storeId") @Valid Long storeId,
-      @RequestBody @Valid StoreCommand storeCommand) {
-    storeService.update(storeId, storeCommand);
+      @RequestBody @Valid StoreRequestDTO storeRequestDTO) {
+    storeService.update(storeId, storeRequestDTO);
     return new ResponseEntity(HttpStatus.OK);
   }
 

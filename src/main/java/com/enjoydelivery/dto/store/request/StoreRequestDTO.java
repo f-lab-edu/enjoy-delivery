@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StoreCommand {
+public class StoreRequestDTO {
 
   @NotNull
   private String registrationNumber;

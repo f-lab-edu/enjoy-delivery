@@ -1,6 +1,6 @@
 package com.enjoydelivery.entity;
 
-import com.enjoydelivery.dto.category.request.CategoryCommand;
+import com.enjoydelivery.dto.category.request.CategoryRequestDTO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,7 +26,7 @@ public class Category {
 
   private String name;
 
-  public void update(CategoryCommand categoryCommand) {
-    this.name = categoryCommand.getName();
+  public void update(CategoryRequestDTO categoryRequestDTO) {
+    this.name = categoryRequestDTO.getName();
   }
 }

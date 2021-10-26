@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReadMenuCommand {
+public class ReadMenuResponseDTO {
 
   @NotNull
   private Long id;
@@ -18,7 +18,7 @@ public class ReadMenuCommand {
   @NotNull
   private int price;
 
-  public ReadMenuCommand(Menu menu) {
+  public ReadMenuResponseDTO(Menu menu) {
     this.id = menu.getId();
     this.name = menu.getName();
     this.price = menu.getPrice();

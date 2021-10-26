@@ -1,6 +1,6 @@
 package com.enjoydelivery.entity;
 
-import com.enjoydelivery.dto.store.request.StoreCommand;
+import com.enjoydelivery.dto.store.request.StoreRequestDTO;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -70,17 +70,17 @@ public class Store {
   @OneToMany(mappedBy = "store")
   private List<Menu> menus = new ArrayList<>();
 
-  public void update(StoreCommand storeCommand) {
-    this.registrationNumber = storeCommand.getRegistrationNumber();
-    this.name = storeCommand.getName();
-    this.phoneNumber = storeCommand.getPhoneNumber();
-    this.address = storeCommand.getAddress();
-    this.thumbnailUrl = storeCommand.getThumbnailUrl();
-    this.category = storeCommand.getCategoryInfo().toEntity();
-    this.description = storeCommand.getDescription();
-    this.openedAt = storeCommand.getOpenedAt();
-    this.closedAt = storeCommand.getClosedAt();
-    this.minimalOrderCost = storeCommand.getMinimalOrderCost();
-    this.deliveryCost = storeCommand.getDeliveryCost();
+  public void update(StoreRequestDTO storeRequestDTO) {
+    this.registrationNumber = storeRequestDTO.getRegistrationNumber();
+    this.name = storeRequestDTO.getName();
+    this.phoneNumber = storeRequestDTO.getPhoneNumber();
+    this.address = storeRequestDTO.getAddress();
+    this.thumbnailUrl = storeRequestDTO.getThumbnailUrl();
+    this.category = storeRequestDTO.getCategoryInfo().toEntity();
+    this.description = storeRequestDTO.getDescription();
+    this.openedAt = storeRequestDTO.getOpenedAt();
+    this.closedAt = storeRequestDTO.getClosedAt();
+    this.minimalOrderCost = storeRequestDTO.getMinimalOrderCost();
+    this.deliveryCost = storeRequestDTO.getDeliveryCost();
   }
 }
