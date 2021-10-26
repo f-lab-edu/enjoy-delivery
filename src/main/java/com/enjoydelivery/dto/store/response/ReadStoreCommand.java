@@ -1,5 +1,6 @@
 package com.enjoydelivery.dto.store.response;
 
+import com.enjoydelivery.dto.category.response.ReadCategoryCommand;
 import com.enjoydelivery.entity.Store;
 import java.util.List;
 import java.util.stream.Collectors;
