@@ -4,15 +4,21 @@ import com.enjoydelivery.entity.OrderItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
@@ -41,7 +47,7 @@ public class CartDAO {
     String key = generateKey(userId);
     String hashKey = generateHashKey(userId, storeId);
 
-    List<Object> txResults = redisTemplate.execute(new SessionCallback<List<Object>>() {
+    redisTemplate.execute(new SessionCallback<List<Object>>() {
       public List<Object> execute(RedisOperations operations) throws DataAccessException {
         operations.multi();
         operations.opsForValue().set(key, storeId);
@@ -51,26 +57,19 @@ public class CartDAO {
     });
   }
 
-
   public void deleteAll(Long userId) {
     String key = generateKey(userId);
     String hashKey = getHashKey(userId);
 
-    List<Object> txResults = redisTemplate.execute(new SessionCallback<List<Object>>() {
+    redisTemplate.execute(new SessionCallback<List<Object>>() {
       public List<Object> execute(RedisOperations operations) throws DataAccessException {
         operations.multi();
 
-        ScanOptions scanOptions = ScanOptions.scanOptions().match("*").count(100).build();
-        Cursor cursor = operations.opsForHash().scan(hashKey, scanOptions);
-        String[] fields = new String[operations.opsForHash().size(hashKey).intValue()];
-        int i = 0;
-        while(cursor.hasNext()) {
-          Object o = cursor.next();
-          String str = objectMapper.convertValue(o, String.class);
-          fields[i++] = str;
+        Set<Object> fields = operations.opsForHash().keys(hashKey);
+        for(Object o : fields) {
+          operations.opsForHash().delete(hashKey, o);
         }
-        operations.opsForHash().delete(hashKey, fields);
-
+        
         operations.delete(hashKey);
         operations.delete(key);
 
@@ -80,16 +79,17 @@ public class CartDAO {
   }
 
 
- public void deleteOneOrderItem(Long menuId, Long userId) {
+  public void deleteOneOrderItem(Long menuId, Long userId) {
     String hashKey = getHashKey(userId);
     String key = generateKey(userId);
+    Long size = redisTemplate.opsForHash().size(hashKey);
 
-   List<Object> txResults = redisTemplate.execute(new SessionCallback<List<Object>>() {
+   redisTemplate.execute(new SessionCallback<List<Object>>() {
      public List<Object> execute(RedisOperations operations) throws DataAccessException {
        operations.multi();
 
        operations.opsForHash().delete(hashKey, menuId+"");
-       if (operations.opsForHash().size(hashKey) == 0) {
+       if (size - 1 == 0) {
          operations.delete(hashKey);
          operations.delete(key);
        }
@@ -102,18 +102,38 @@ public class CartDAO {
 
   public List<OrderItem> findAllByUserId(Long userId) {
 
+    RedisSerializer keySerializer = redisTemplate.getKeySerializer();
+    RedisSerializer hashValueSerialier = redisTemplate.getHashValueSerializer();
     String key = getHashKey(userId);
-    List<OrderItem> result = new ArrayList<>();
-    ScanOptions scanOptions = ScanOptions.scanOptions().match("*").count(100).build();
-    Cursor cursor = redisTemplate.opsForHash().scan(key, scanOptions);
-    while(cursor.hasNext()) {
-      Object o = cursor.next();
-      OrderItem oi = objectMapper.convertValue(o, OrderItem.class);
-      result.add(oi);
-    }
+    List<Object> result = new ArrayList<>();
 
-    return result;
+    redisTemplate.execute(
+        new RedisCallback<Object>() {
+          public Object doInRedis(RedisConnection connection) throws DataAccessException {
+            ScanOptions scanOptions = ScanOptions.scanOptions().match("*").count(100).build();
+            Cursor<Entry<byte[], byte[]>> cursor = connection.hashCommands().hScan(
+                keySerializer.serialize(key), scanOptions);
+
+            while(cursor.hasNext()) {
+              Entry<byte[], byte[]> entry = cursor.next();
+
+              result.add(hashValueSerialier.deserialize(entry.getValue()));
+            }
+            return result;
+          }
+        });
+
+
+    return Optional.ofNullable(result)
+        .orElse(new ArrayList<>())
+        .stream()
+        .map(o -> objectMapper.convertValue(o, OrderItem.class))
+        .collect(Collectors.toList());
   }
+
+
+
+
 
   public Long findStoreIdByUserId(Long userId) {
     String key = generateKey(userId);
