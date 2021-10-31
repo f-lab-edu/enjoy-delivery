@@ -18,12 +18,25 @@ public class StoreService {
 
   public List<Store> readAllByCategory(Long categoryId) {
     Category findCategory = categoryService.readOneById(categoryId);
-    return storeRepository.findStoreFetchJoinByCategory(findCategory);
+    List<Store> stores = storeRepository.findStoreFetchJoinByCategory(findCategory);
+    if (stores == null || stores.isEmpty()) {
+      throw new RuntimeException();
+    }
+    return stores;
   }
 
   public Store readOneFetchJoinById(Long storeId) {
-    return storeRepository.findDistinctStoreFetchJoinById(storeId)
+    Store findStore = storeRepository.findDistinctStoreFetchJoinById(storeId)
         .orElseThrow(RuntimeException::new);
+
+    if (findStore.getCategory() == null) {
+      throw new RuntimeException();
+    }
+
+    if (findStore.getMenus() == null) {
+      throw new RuntimeException();
+    }
+    return findStore;
   }
 
   public Store readOneById(Long storeId) {
@@ -35,12 +48,20 @@ public class StoreService {
     Store store = storeRequestDTO.toEntity();
     if (!storeRepository.existsByName(store.getName())) {
       storeRepository.save(store);
+      return;
     }
+    throw new RuntimeException();
   }
 
   @Transactional
   public void update(Long storeId, StoreRequestDTO storeRequestDTO) {
     Store findStore = readOneById(storeId);
     findStore.update(storeRequestDTO);
+  }
+
+  public Store readOneByOwnerId(Long ownerId) {
+    return storeRepository.findStoreByOwner_Id(ownerId)
+        .orElseThrow(RuntimeException::new);
+
   }
 }
