@@ -1,7 +1,9 @@
 package com.enjoydelivery.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -14,10 +16,10 @@ import com.enjoydelivery.entity.Menu;
 import com.enjoydelivery.entity.MenuState;
 import com.enjoydelivery.entity.Owner;
 import com.enjoydelivery.entity.Store;
+import com.enjoydelivery.repository.StoreRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,28 +31,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class StoreServiceTest {
 
   @InjectMocks
-  StoreService2 storeService;
+  StoreService storeService;
 
   @Mock
-  StoreRepository2 storeRepository;
+  StoreRepository storeRepository;
 
   @Mock
   CategoryService categoryService;
 
-  StoreRequestDTO storeRequestDTO;
-
-  Store store;
-
-  Category category;
-
-  Menu menu;
-
-  Owner owner;
-
-  @BeforeEach
-  public void makeStore() {
-    storeRequestDTO
-        = new StoreRequestDTO(
+  public StoreRequestDTO makeStoreRequestDTO() {
+    return new StoreRequestDTO(
         "00010030",
         "가게이름" ,
         "0320001111",
@@ -63,26 +53,57 @@ public class StoreServiceTest {
         15000,
         3000
     );
+  }
 
-    store = storeRequestDTO.toEntity();
+
+  private StoreRequestDTO makeUpdateStoreReqeustDTO() {
+    return new StoreRequestDTO(
+        "00010031",//update
+        "수정된가게이름" ,//update
+        "0320001111",
+        "updateAddress",//update
+        "updateThumbnailUrl",//update
+        new CategoryInfo(1L, "한식"),
+        "updateDescription",
+        "12:00",
+        "23:00",
+        15000,
+        3000
+    );
+  }
+
+  public Store makeStore() {
+    return makeStore(makeStoreRequestDTO());
+  }
+
+  public Store makeStore(StoreRequestDTO storeRequestDTO) {
+    Store store = storeRequestDTO.toEntity();
     store.setId(1L);
+    return store;
+  }
 
-    menu = Menu.builder()
+
+  public Menu makeMenu() {
+    return Menu.builder()
         .id(1L)
         .name("menu")
         .price(15000)
-        .store(store)
+        .store(makeStore())
         .description("메뉴 설명")
         .menuState(MenuState.ALIVE)
         .thumbnailUrl("thumbnail")
         .build();
+  }
 
-    category = Category.builder()
+  public Category makeCategory() {
+    return Category.builder()
         .id(1L)
         .name("일식")
         .build();
+  }
 
-    owner = Owner.builder()
+  public Owner makeOwner() {
+    return Owner.builder()
         .id(1L)
         .uid("uid")
         .phoneNumber("01023923000")
@@ -97,38 +118,52 @@ public class StoreServiceTest {
   @DisplayName("가게 등록 성공")
   void createSuccess(){
 
+    //Arrange
+    StoreRequestDTO storeRequestDTO = makeStoreRequestDTO();
+    String storeName = storeRequestDTO.getName();
+    Store store = makeStore(storeRequestDTO);
+
     doReturn(false)
         .when(storeRepository)
-        .existsByName(store.getName());
+        .existsByName(storeName);
 
     doReturn(store)
         .when(storeRepository)
         .save(any(Store.class));
 
+    //Act
     storeService.create(storeRequestDTO);
 
+    //Assert
     verify(storeRepository, times(1))
-        .existsByName(store.getName());
-
-    verify(storeRepository, times(1))
-        .save(any(Store.class));
-
+        .save(argThat(s -> s.getName().equals(storeRequestDTO.getName())
+            && s.getAddress().equals(storeRequestDTO.getAddress())
+        && s.getPhoneNumber().equals(storeRequestDTO.getPhoneNumber())
+        && s.getRegistrationNumber().equals(storeRequestDTO.getRegistrationNumber())));
   }
+
 
   @Test
   @DisplayName("가게 등록 실패 : 중복된 가게 이름")
   void createFail() {
 
+    //Arrange
+    StoreRequestDTO storeRequestDTO = makeStoreRequestDTO();
+    String storeName = storeRequestDTO.getName();
+
     doReturn(true)
         .when(storeRepository)
-        .existsByName(store.getName());
+        .existsByName(storeName);
 
+    //Act
     assertThatThrownBy(() -> {
       storeService.create(storeRequestDTO);
-    }).isInstanceOf(RuntimeException.class);
+    }).isInstanceOf(RuntimeException.class)
+        .hasMessage(StoreService.EXCEPTION_DUPLICATE_NAME);
 
-    verify(storeRepository, times(1))
-        .existsByName(store.getName());
+    //Assert
+    verify(storeRepository, times(0))
+        .save(any(Store.class));
 
   }
 
@@ -136,30 +171,58 @@ public class StoreServiceTest {
   @DisplayName("가게 조회 성공")
   void readOneByIdSuccess() {
 
+    // Arrange
+    Store store = makeStore();
+    Owner owner = makeOwner();
+    Menu menu = makeMenu();
+    Category category = makeCategory();
+    List<Menu> menus = new ArrayList<>();
+    menus.add(menu);
+
+    store.setMenus(menus);
+    store.setCategory(category);
+    store.setOwner(owner);
+
+    Long storeId = store.getId();
+
     doReturn(Optional.of(store))
         .when(storeRepository)
-        .findById(store.getId());
+        .findById(storeId);
 
-    storeService.readOneById(store.getId());
+    // Act
+    Store actual = storeService.readOneById(storeId);
 
-    verify(storeRepository, times(1))
-        .findById(store.getId());
+    //Assert
+    assertThat(store).isEqualTo(actual);
   }
 
   @Test
   @DisplayName("가게 조회 실패 : DB에 일치하는 가게 데이터가 없음.")
   void readOneByIdFail() {
 
+    // Arrange
+    Store store = makeStore();
+    Owner owner = makeOwner();
+    Menu menu = makeMenu();
+    Category category = makeCategory();
+    List<Menu> menus = new ArrayList<>();
+    menus.add(menu);
+
+    store.setMenus(menus);
+    store.setCategory(category);
+    store.setOwner(owner);
+
+    Long storeId = store.getId();
+
     doReturn(Optional.empty())
         .when(storeRepository)
-        .findById(store.getId());
+        .findById(storeId);
 
+    //Act , Assert
     assertThatThrownBy(() -> {
-      storeService.readOneById(store.getId());
-    }).isInstanceOf(RuntimeException.class);
-
-    verify(storeRepository, times(1))
-        .findById(store.getId());
+      storeService.readOneById(storeId);
+    }).isInstanceOf(RuntimeException.class)
+        .hasMessage(StoreService.EXCEPTION_NOT_FOUND_STORE);
 
   }
 
@@ -168,20 +231,14 @@ public class StoreServiceTest {
   @Test
   @DisplayName("가게 조회 시 카테고리, 메뉴 정보가 같이 조회됨")
   void readOneFetchJoinByIdSuccess() {
-/*
-  public Store readOneFetchJoinById(Long storeId) {
-    Store findStore = storeRepository.findDistinctStoreFetchJoinById(storeId)
-        .orElseThrow(RuntimeException::new);
 
-    if (findStore.getCategory() == null) {
-      throw new RuntimeException();
-    }
+    // Arrange
+    Store store = makeStore();
+    Long storeId = store.getId();
+    Menu menu = makeMenu();
 
-    if (findStore.getMenus() == null) {
-      throw new RuntimeException();
-    }
-    return findStore;
-  }*/
+    Category category = makeCategory();
+
     List<Menu> menus = new ArrayList<>();
     menus.add(menu);
 
@@ -190,17 +247,29 @@ public class StoreServiceTest {
 
     doReturn(Optional.of(store))
         .when(storeRepository)
-        .findDistinctStoreFetchJoinById(store.getId());
+        .findDistinctStoreFetchJoinById(storeId);
 
-    storeService.readOneFetchJoinById(store.getId());
+    // Act
+    Store actual = storeService
+        .readOneFetchJoinById(storeId);
 
-    verify(storeRepository,times(1))
-        .findDistinctStoreFetchJoinById(store.getId());
+    // Assert
+    assertThat(actual.getMenus()).isNotNull();
+    assertThat(actual.getCategory()).isNotNull();
+    assertThat(actual.getOwner()).isNull();
+
+    assertThat(actual).isEqualTo(store);
   }
 
   @Test
   @DisplayName("가게, 메뉴, 카테고리 정보 조회시 조회되는 가게가 없음")
   void readOneFetchJoinByIdFail1() {
+
+    // Arrange
+    Store store = makeStore();
+    Long storeId = store.getId();
+    Menu menu = makeMenu();
+    Category category = makeCategory();
 
     List<Menu> menus = new ArrayList<>();
     menus.add(menu);
@@ -210,38 +279,49 @@ public class StoreServiceTest {
 
     doReturn(Optional.empty())
         .when(storeRepository)
-        .findDistinctStoreFetchJoinById(store.getId());
+        .findDistinctStoreFetchJoinById(storeId);
 
+    // Act, Assert
     assertThatThrownBy(() -> {
-      storeService.readOneFetchJoinById(store.getId());
-    }).isInstanceOf(RuntimeException.class);
+      storeService.readOneFetchJoinById(storeId);
+    }).isInstanceOf(RuntimeException.class)
+        .hasMessage(StoreService.EXCEPTION_NOT_FOUND_STORE);
 
-    verify(storeRepository,times(1))
-        .findDistinctStoreFetchJoinById(store.getId());
+
   }
 
   @Test
   @DisplayName("가게 , 메뉴 , 카테고리 조회 시 메뉴가 조회되지 않음")
   void readOneFetchJoinByIdFail2() {
 
-    store.setMenus(null);
+    Store store = makeStore();
+    Long storeId = store.getId();
+    Category category = makeCategory();
+
     store.setCategory(category);
+    store.setMenus(null);
 
     doReturn(Optional.of(store))
         .when(storeRepository)
-        .findDistinctStoreFetchJoinById(store.getId());
+        .findDistinctStoreFetchJoinById(storeId);
 
+    // Act , Assert
     assertThatThrownBy(() -> {
-      storeService.readOneFetchJoinById(store.getId());
-    }).isInstanceOf(RuntimeException.class);
+      storeService.readOneFetchJoinById(storeId);
+    }).isInstanceOf(RuntimeException.class)
+        .hasMessage(StoreService.EXCEPTION_NOT_FOUND_MENUS);
 
-    verify(storeRepository,times(1))
-        .findDistinctStoreFetchJoinById(store.getId());
+
   }
 
   @Test
   @DisplayName("가게 , 메뉴 , 카테고리 조회 시 카테고리가 조회되지 않음")
   void readOneFetchJoinByIdFail3() {
+
+    Menu menu = makeMenu();
+    Store store = makeStore();
+    Long storeId = store.getId();
+
     List<Menu> menus = new ArrayList<>();
     menus.add(menu);
 
@@ -250,44 +330,73 @@ public class StoreServiceTest {
 
     doReturn(Optional.of(store))
         .when(storeRepository)
-        .findDistinctStoreFetchJoinById(store.getId());
+        .findDistinctStoreFetchJoinById(storeId);
 
     assertThatThrownBy(() -> {
-      storeService.readOneFetchJoinById(store.getId());
-    }).isInstanceOf(RuntimeException.class);
+      storeService.readOneFetchJoinById(storeId);
+    }).isInstanceOf(RuntimeException.class)
+        .hasMessage(StoreService.EXCEPTION_NOT_FOUND_CATEGORY);
 
-    verify(storeRepository,times(1))
-        .findDistinctStoreFetchJoinById(store.getId());
   }
 
-//변경 감지??
+
   @Test
   @DisplayName("가게 정보 변경 성공")
   void updateSuccess() {
 
-    doReturn(Optional.of(store))
+    // Arrange
+    Store beforeStore = makeStore();
+
+    Store updateStore = makeStore();
+    Long storeId = updateStore.getId();
+    StoreRequestDTO updateStoreRequestDTO
+        = makeUpdateStoreReqeustDTO();
+
+    doReturn(Optional.of(updateStore))
         .when(storeRepository)
-        .findById(store.getId());
+        .findById(storeId);
 
-    storeService.update(store.getId(), storeRequestDTO);
-    store.update(storeRequestDTO);
+    // Act
+    storeService.update(storeId, updateStoreRequestDTO);
 
-    verify(storeRepository, times(1))
-        .findById(store.getId());
+    //Assert
+    assertThat(updateStore.getId())
+        .isEqualTo(beforeStore.getId());
+
+    assertThat(updateStore.getRegistrationNumber())
+        .isNotEqualTo(beforeStore.getRegistrationNumber());
+
+    assertThat(updateStore.getName())
+        .isNotEqualTo(beforeStore.getName());
+
+    assertThat(updateStore.getAddress())
+        .isNotEqualTo(beforeStore.getAddress());
+
+    assertThat(updateStore.getThumbnailUrl())
+        .isNotEqualTo(beforeStore.getThumbnailUrl());
+
 
   }
+
 
   @Test
   @DisplayName("가게 정보 변경 실패 : 조회되는 가게가 없음")
   void updateFail() {
 
+    StoreRequestDTO storeRequestDTO = makeStoreRequestDTO();
+    Store store = makeStore(storeRequestDTO);
+    Long storeId = store.getId();
+
     doReturn(Optional.empty())
         .when(storeRepository)
-        .findById(store.getId());
+        .findById(storeId);
 
     assertThatThrownBy(() -> {
-      storeService.update(store.getId(), storeRequestDTO);
-    }).isInstanceOf(RuntimeException.class);
+      storeService.update(storeId, storeRequestDTO);
+    }).isInstanceOf(RuntimeException.class)
+        .hasMessage(StoreService.EXCEPTION_NOT_FOUND_STORE);
+
+
 
   }
 
@@ -295,6 +404,10 @@ public class StoreServiceTest {
   @DisplayName("카테고리별 가게 목록 조회 성공")
   void readAllByCategorySuccess() {
 
+    // Arrange
+    Category category = makeCategory();
+    Long categoryId = category.getId();
+    Store store = makeStore();
     store.setCategory(category);
 
     List<Store> stores = new ArrayList<>();
@@ -302,20 +415,20 @@ public class StoreServiceTest {
 
     doReturn(category)
         .when(categoryService)
-        .readOneById(category.getId());
+        .readOneById(categoryId);
 
     doReturn(stores)
         .when(storeRepository)
         .findStoreFetchJoinByCategory(any(Category.class));
 
-    storeService.readAllByCategory(category.getId());
+    // Act
+    List<Store> actualStores = storeService
+        .readAllByCategory(categoryId);
 
-    verify(categoryService,times(1))
-        .readOneById(category.getId());
-
-    verify(storeRepository,times(1))
-        .findStoreFetchJoinByCategory(any(Category.class));
-
+    // Assert
+    assertThat(actualStores.size()).isSameAs(stores.size());
+    assertThat(actualStores).isEqualTo(stores);
+    assertThat(actualStores.get(0)).isEqualTo(stores.get(0));
   }
 
 
@@ -323,23 +436,31 @@ public class StoreServiceTest {
   @DisplayName("카테고리별 가게 목록 조회 실패 : 카테고리 정보가 없음")
   void readAllByCategoryFail1() {
 
+    Category category = makeCategory();
+    Store store = makeStore();
+    Long categoryId = category.getId();
+
     doThrow(RuntimeException.class)
         .when(categoryService)
-        .readOneById(category.getId());
+        .readOneById(categoryId);
 
     assertThatThrownBy(() -> {
-      storeService.readAllByCategory(category.getId());
+      storeService.readAllByCategory(categoryId);
     }).isInstanceOf(RuntimeException.class);
 
+    verify(storeRepository, times(0))
+        .findStoreFetchJoinByCategory(any(Category.class));
 
-    verify(categoryService,times(1))
-        .readOneById(category.getId());
   }
 
 
   @Test
   @DisplayName("카테고리별 가게 목록 조회 실패 : 가게 정보가 없음")
   void readAllByCategoryFail2() {
+
+    Category category = makeCategory();
+    Store store = makeStore();
+
     store.setCategory(category);
 
     doReturn(category)
@@ -352,14 +473,9 @@ public class StoreServiceTest {
 
     assertThatThrownBy(() -> {
       storeService.readAllByCategory(category.getId());
-    }).isInstanceOf(RuntimeException.class);
+    }).isInstanceOf(RuntimeException.class)
+        .hasMessage(StoreService.EXCEPTION_NOT_FOUND_STORE);
 
-
-    verify(categoryService,times(1))
-        .readOneById(category.getId());
-
-    verify(storeRepository,times(1))
-        .findStoreFetchJoinByCategory(any(Category.class));
   }
 
 
@@ -367,29 +483,42 @@ public class StoreServiceTest {
   @DisplayName("사장님 소유 가게 조회 성공")
   void readOneByOwnerIdSuccess() {
 
+    // Arrange
+    Owner owner = makeOwner();
+    Long ownerId = owner.getId();
+    Store store = makeStore();
     store.setOwner(owner);
 
     doReturn(Optional.of(store))
         .when(storeRepository)
-        .findStoreByOwner_Id(store.getOwner().getId());
+        .findStoreByOwner_Id(ownerId);
 
-    storeService.readOneByOwnerId(1L);
+    // Act
+    Store actual = storeService.readOneByOwnerId(ownerId);
+
+    // Assert
+    assertThat(actual).isEqualTo(store);
+    assertThat(actual.getOwner()).isEqualTo(owner);
   }
 
   @Test
   @DisplayName("사장님 소유 가게 조회 실패 : 사장님 소유 가게가 없을 때")
   void readOneByOwnerIdFail() {
 
+    Owner owner = makeOwner();
+    Store store = makeStore();
+    Long ownerId = owner.getId();
+
     store.setOwner(owner);
 
     doReturn(Optional.empty())
         .when(storeRepository)
-        .findStoreByOwner_Id(store.getOwner().getId());
+        .findStoreByOwner_Id(ownerId);
 
     assertThatThrownBy(() -> {
-      storeService.readOneByOwnerId(1L);
-    }).isInstanceOf(RuntimeException.class);
-
+      storeService.readOneByOwnerId(ownerId);
+    }).isInstanceOf(RuntimeException.class)
+        .hasMessage(StoreService.EXCEPTION_NOT_FOUND_STORE);
 
   }
 
