@@ -13,6 +13,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CartService {
 
+  public static final String EXCEPTION_INVALID_STORE_ID =
+      "유효하지 않은 가게 ID입니다.";
+  public static final String EXCEPTION_DUPLICATE_MENU =
+      "중복된 메뉴입니다.";
+  public static final String EXCEPTION_EMPTY_CART =
+      "비어있는 장바구니입니다.";
   private final StoreService storeService;
   private final CartDAO cartDAO;
 
@@ -30,22 +36,22 @@ public class CartService {
     }
 
     if (!isSameStore(storeId, findStoreId)) {
-      throw new RuntimeException("같은 가게만 넣을 수 있음");
+      throw new RuntimeException(EXCEPTION_INVALID_STORE_ID);
     }
 
     if (cartDAO.existOrderItem(menuId, userId)) {
-      throw new RuntimeException("똑같은 메뉴를 추가할 경우 장바구니에 넣을 수 없음");
+      throw new RuntimeException(EXCEPTION_DUPLICATE_MENU);
     }
 
     cartDAO.addOrderItem(orderItem, userId, storeId);
 
   }
 
-  private boolean isSameStore(Long storeId, Long findStoreId) {
+  public boolean isSameStore(Long storeId, Long findStoreId) {
     return storeId == findStoreId;
   }
 
-  private boolean isEmptyCart(Long storeId) {
+  public boolean isEmptyCart(Long storeId) {
     return storeId == 0;
   }
 
@@ -60,8 +66,9 @@ public class CartService {
   public ReadCartResponseDTO read(Long userId) {
     List<OrderItem> orderItems = cartDAO.findAllByUserId(userId);
     Long storeId = cartDAO.findStoreIdByUserId(userId);
+
     if (isEmptyCart(storeId)) {
-      throw new RuntimeException("장바구니가 비어있습니다.");
+      throw new RuntimeException(EXCEPTION_EMPTY_CART);
     }
 
     Store store = storeService.readOneById(storeId);
