@@ -56,7 +56,7 @@ public class StoreServiceTest {
   }
 
 
-  private StoreRequestDTO makeUpdateStoreReqeustDTO() {
+  public StoreRequestDTO makeUpdateStoreReqeustDTO() {
     return new StoreRequestDTO(
         "00010031",//update
         "수정된가게이름" ,//update
@@ -129,7 +129,11 @@ public class StoreServiceTest {
 
     doReturn(store)
         .when(storeRepository)
-        .save(any(Store.class));
+        .save(argThat(s -> s.getName().equals(store.getName())
+        && s.getRegistrationNumber().equals(store.getRegistrationNumber())
+        && s.getPhoneNumber().equals(store.getPhoneNumber())
+        && s.getAddress().equals(store.getAddress())
+        && s.getDeliveryCost() == store.getDeliveryCost()));
 
     //Act
     storeService.create(storeRequestDTO);
@@ -419,7 +423,9 @@ public class StoreServiceTest {
 
     doReturn(stores)
         .when(storeRepository)
-        .findStoreFetchJoinByCategory(any(Category.class));
+        .findStoreFetchJoinByCategory(argThat(c ->
+            c.getName().equals(category.getName())));
+
 
     // Act
     List<Store> actualStores = storeService
@@ -469,7 +475,8 @@ public class StoreServiceTest {
 
     doReturn(new ArrayList<>())
         .when(storeRepository)
-        .findStoreFetchJoinByCategory(any(Category.class));
+        .findStoreFetchJoinByCategory(argThat(c ->
+            c.getName().equals(category.getName())));
 
     assertThatThrownBy(() -> {
       storeService.readAllByCategory(category.getId());

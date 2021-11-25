@@ -34,23 +34,23 @@ public class CategoryServiceTest {
     return makeCategory(makeCategoryRequestDTO());
   }
 
-  private Category makeCategory(CategoryRequestDTO categoryRequestDTO) {
+  public Category makeCategory(CategoryRequestDTO categoryRequestDTO) {
     Category category = categoryRequestDTO.toEntity();
     category.setId(1L);
     return category;
   }
 
-  private CategoryRequestDTO makeCategoryRequestDTO() {
+  public CategoryRequestDTO makeCategoryRequestDTO() {
     return new CategoryRequestDTO("중식");
   }
 
-  private CategoryRequestDTO makeUpdateCategoryRequestDTO() {
+  public CategoryRequestDTO makeUpdateCategoryRequestDTO() {
     return new CategoryRequestDTO("양식");
   }
 
   @Test
   @DisplayName("카테고리 목록 조회 성공")
-  private void readAllSuccess() {
+  void readAllSuccess() {
 
     // Arrange
     List<Category> categories = new ArrayList<>();
@@ -73,25 +73,25 @@ public class CategoryServiceTest {
 
   @Test
   @DisplayName("카테고리 목록 조회 실패 : 조회되는 카테고리 목록이 없을 경우")
-  private void readAllFail() {
+  void readAllFail() {
     // Arrange
     List<Category> categories = new ArrayList<>();
     Category category = makeCategory();
 
-    doReturn(categories)
+    doReturn(new ArrayList<>())
         .when(categoryRepository)
         .findAll();
 
     // Act, assert
     assertThatThrownBy(() -> {
-     actual = categoryService.readAll();
+     categoryService.readAll();
     }).isInstanceOf(RuntimeException.class)
-        .hasMessage(CategoryService.EXCEPTION_NOT_FOUND_CATEGORIES);
+        .hasMessage(CategoryService.EXCEPTION_NOT_FOUND_CATEGORY);
   }
 
   @Test
   @DisplayName("카테고리 등록 성공")
-  private void createSuccess() {
+  void createSuccess() {
 
     // Arrange
     CategoryRequestDTO categoryRequestDTO = makeCategoryRequestDTO();
@@ -113,7 +113,7 @@ public class CategoryServiceTest {
 
   @Test
   @DisplayName("카테고리 등록 실패 : 이미 등록된 카테고리명이 존재함")
-  private void createFail() {
+  void createFail() {
     // Arrange
     CategoryRequestDTO categoryRequestDTO = makeCategoryRequestDTO();
     String categoryName = categoryRequestDTO.getName();
@@ -136,7 +136,7 @@ public class CategoryServiceTest {
 
   @Test
   @DisplayName("카테고리 수정 성공")
-  private void updateSuccess() {
+  void updateSuccess() {
 
     // Arrange
     CategoryRequestDTO updateCategoryRequestDTO
@@ -166,7 +166,7 @@ public class CategoryServiceTest {
 
   @Test
   @DisplayName("카테고리 수정 실패 : DB에 카테고리가 존재하지 않음.")
-  private void updateFail() {
+  void updateFail() {
     // Arrange
     CategoryRequestDTO updateCategoryRequestDTO
         = makeUpdateCategoryRequestDTO();
@@ -174,7 +174,7 @@ public class CategoryServiceTest {
     Category updateCategory = makeCategory();
     Long categoryId = updateCategory.getId();
 
-    doReturn(Optional.of(updateCategory))
+    doReturn(Optional.empty())
         .when(categoryRepository)
         .findById(categoryId);
 
@@ -188,12 +188,12 @@ public class CategoryServiceTest {
 
   @Test
   @DisplayName("카테고리 삭제 성공")
-  private void deleteSuccess() {
+  void deleteSuccess() {
     // Arrange
     Category category = makeCategory();
     Long categoryId = category.getId();
 
-    doReturn(category)
+    doReturn(Optional.of(category))
         .when(categoryRepository)
         .findById(categoryId);
 
@@ -209,12 +209,12 @@ public class CategoryServiceTest {
 
   @Test
   @DisplayName("카테고리 삭제 실패 : DB에 존재하는 카테고리가 없음.")
-  private void deleteFail() {
+  void deleteFail() {
     // Arrange
     Category category = makeCategory();
     Long categoryId = category.getId();
 
-    doReturn(category)
+    doReturn(Optional.empty())
         .when(categoryRepository)
         .findById(categoryId);
 
@@ -231,13 +231,13 @@ public class CategoryServiceTest {
 
   @Test
   @DisplayName("카테고리 조회 성공")
-  private void readOneByIdSuccess() {
+  void readOneByIdSuccess() {
 
     // Arrange
     Category category = makeCategory();
     Long categoryId = category.getId();
 
-    doReturn(category).when(categoryRepository)
+    doReturn(Optional.of(category)).when(categoryRepository)
         .findById(categoryId);
 
     // Act
@@ -246,18 +246,18 @@ public class CategoryServiceTest {
     // Assert
     assertThat(actual).isEqualTo(category);
     assertThat(actual.getName()).isEqualTo(category.getName());
-    assertThat(actual.getId()).isEqualTo(category.getName());
+    assertThat(actual.getId()).isEqualTo(category.getId());
   }
 
   @Test
   @DisplayName("카테고리 조회 실패 : DB에 존재하는 카테고리가 없음")
-  private void readOneByIdFail() {
+  void readOneByIdFail() {
 
     // Arrange
     Category category = makeCategory();
     Long categoryId = category.getId();
 
-    doReturn(category).when(categoryRepository)
+    doReturn(Optional.empty()).when(categoryRepository)
         .findById(categoryId);
 
     // Act, Assert

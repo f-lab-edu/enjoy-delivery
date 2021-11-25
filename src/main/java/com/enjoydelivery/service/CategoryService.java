@@ -12,18 +12,32 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CategoryService {
 
+  public static final String EXCEPTION_NOT_FOUND_CATEGORY
+      = "조회되는 카테고리 데이터가 없습니다.";
+  public static final String EXCEPTION_DUPLICATE_NAME =
+      "중복된 이름입니다.";
+
   private final CategoryRepository categoryRepository;
 
   public List<Category> readAll() {
-    return categoryRepository.findAll();
+
+    List<Category> categories =
+        categoryRepository.findAll();
+
+    if (categories == null || categories.isEmpty()) {
+      throw new RuntimeException(EXCEPTION_NOT_FOUND_CATEGORY);
+    }
+
+    return categories;
   }
 
   public void create(CategoryRequestDTO categoryRequestDTO) {
     Category category = categoryRequestDTO.toEntity();
 
-    if (!categoryRepository.existsByName(category.getName())) {
-      categoryRepository.save(category);
+    if (categoryRepository.existsByName(category.getName())) {
+      throw new RuntimeException(EXCEPTION_DUPLICATE_NAME);
     }
+    categoryRepository.save(category);
 
   }
 
@@ -40,7 +54,7 @@ public class CategoryService {
 
   public Category readOneById(Long categoryId) {
     return categoryRepository.findById(categoryId)
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new RuntimeException(EXCEPTION_NOT_FOUND_CATEGORY));
   }
 
 }
