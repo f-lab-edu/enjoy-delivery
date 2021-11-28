@@ -56,4 +56,9 @@ public class Menu {
   public void updateDeleteState() {
     this.menuState = MenuState.DELETED;
   }
+
+  public void setStore(Store store) {
+    this.store = store;
+    store.getMenus().add(this);
+  }
 }
