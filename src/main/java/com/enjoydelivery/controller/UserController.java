@@ -39,33 +39,31 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Long> login(@RequestBody @Valid LoginDTO loginDTO,
-      HttpServletResponse httpServletResponse) {
-    Long userId = userService.login(
+  public ResponseEntity login(
+      @RequestBody @Valid LoginDTO loginDTO) {
+    userService.login(
         loginDTO.getUid(),
         loginDTO.getPassword());
 
-    Cookie cookie = new Cookie("userId", userId.toString());
-    cookie.setPath("/");
-    httpServletResponse.addCookie(cookie);
-    return new ResponseEntity<>(userId, HttpStatus.OK);
+    return new ResponseEntity(HttpStatus.OK);
   }
 
   @PutMapping("/edit")
-  public ResponseEntity update(@RequestBody @Valid UpdateUserDTO updateUserDTO,
-      HttpServletRequest httpServletRequest) {
+  public ResponseEntity update(
+      @RequestBody @Valid UpdateUserDTO updateUserDTO) {
 
-    Long userId = getUserIdFromCookie(httpServletRequest.getCookies());
-
+    UserInfo userInfo = loginService.getCurrentUserInfo();
+    Long userId = userInfo.getId();
     userService.update(userId, updateUserDTO);
 
     return new ResponseEntity(HttpStatus.OK);
   }
 
   @GetMapping
-  public ResponseEntity<ReadUserDTO> read(HttpServletRequest httpServletRequest) {
+  public ResponseEntity<ReadUserDTO> read() {
 
-    Long userId = getUserIdFromCookie(httpServletRequest.getCookies());
+    UserInfo userInfo = loginService.getCurrentUserInfo();
+    Long userId = userInfo.getId();
 
     User user = userService.readOneById(userId);
 
@@ -74,20 +72,11 @@ public class UserController {
   }
 
   @GetMapping("/test")
-  public ResponseEntity<UserInfo> sessionTest(HttpServletRequest httpServletRequest) {
-    Long userId = getUserIdFromCookie(httpServletRequest.getCookies());
-    UserInfo userInfo = loginService.getCurrentUserInfo(userId);
+  public ResponseEntity<UserInfo> sessionTest() {
+    UserInfo userInfo = loginService.getCurrentUserInfo();
 
     return new ResponseEntity(userInfo, HttpStatus.OK);
 
-  }
-
-  public static Long getUserIdFromCookie(Cookie[] cookies) {
-    return Arrays.stream(cookies)
-        .filter(c -> c.getName().equals("userId"))
-        .map(c -> Long.parseLong(c.getValue()))
-        .findFirst()
-        .orElseThrow(RuntimeException::new);
   }
 
 }
