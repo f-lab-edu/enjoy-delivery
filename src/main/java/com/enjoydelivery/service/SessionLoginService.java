@@ -12,16 +12,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SessionLoginService implements LoginService {
 
+  private static final String USER = "user";
   private final HttpSession session;
   private final RedisTemplate redisTemplate;
 
   @Override
-  public void loginUser(Long userId, UserInfo userInfo) {
-    session.setAttribute(String.valueOf(userId), userInfo);
+  public void loginUser(UserInfo userInfo) {
+    session.setAttribute(USER, userInfo);
   }
 
   @Override
-  public UserInfo getCurrentUserInfo(Long userId) {
-    return (UserInfo) session.getAttribute(String.valueOf(userId));
+  public UserInfo getCurrentUserInfo() {
+    return (UserInfo) session.getAttribute(USER);
   }
 }
