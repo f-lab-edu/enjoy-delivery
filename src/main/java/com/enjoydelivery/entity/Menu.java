@@ -1,6 +1,7 @@
 package com.enjoydelivery.entity;
 
 
+import com.enjoydelivery.dto.menu.request.UpdateMenuRequestDTO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -43,4 +44,16 @@ public class Menu {
 
   @Enumerated(EnumType.STRING)
   private MenuState menuState;
+
+  public void update(UpdateMenuRequestDTO dto) {
+    this.name = dto.getName();
+    this.price = dto.getPrice();
+    this.description = dto.getDescription();
+    this.thumbnailUrl = dto.getThumbnailUrl();
+    this.menuState = dto.getMenuState();
+  }
+
+  public void updateDeleteState() {
+    this.menuState = MenuState.DELETED;
+  }
 }
