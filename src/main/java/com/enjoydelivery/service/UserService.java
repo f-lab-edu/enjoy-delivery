@@ -30,20 +30,20 @@ public class UserService {
     userRepository.save(user);
   }
 
-  public Long login(String uid, String password) {
+  public void login(String uid, String password) {
 
     User findUser = readOneByUid(uid);
 
     validatePassword(password, findUser.getHashedPassword());
 
     UserInfo userInfo = UserInfo.builder()
+        .id(findUser.getId())
         .userType(findUser.getUserType())
         .createAt(LocalDateTime.now())
         .build();
 
-    loginService.loginUser(findUser.getId(), userInfo);
+    loginService.loginUser(userInfo);
 
-    return findUser.getId();
   }
 
   public void validatePassword(String originPassword, String newPassword) {
