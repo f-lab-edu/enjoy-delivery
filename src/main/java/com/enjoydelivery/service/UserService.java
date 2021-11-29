@@ -39,7 +39,6 @@ public class UserService {
     UserInfo userInfo = UserInfo.builder()
         .id(findUser.getId())
         .userType(findUser.getUserType())
-        .createAt(LocalDateTime.now())
         .build();
 
     loginService.loginUser(userInfo);
