@@ -19,6 +19,4 @@ public class UserInfo implements Serializable {
 
   private UserType userType;
 
-  private LocalDateTime createAt;
-
 }
