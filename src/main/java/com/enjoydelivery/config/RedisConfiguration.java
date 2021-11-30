@@ -21,14 +21,17 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfiguration {
 
-  @Value("${spring.redis.host}")
-  private String host;
+  @Value("${spring.redis.cache.host}")
+  private String cacheHost;
 
-  @Value("${spring.redis.default.port}")
-  private int port;
+  @Value("${spring.redis.session.host}")
+  private String sessionHost;
+
+  @Value("${spring.redis.cache.port}")
+  private int cachePost;
 
   @Value("${spring.redis.session.port}")
-  private int redisSessionPort;
+  private int sessionPort;
 
   @Bean
   public ObjectMapper objectMapper() {
@@ -78,8 +81,8 @@ public class RedisConfiguration {
   @Bean({"redisConnectionFactory", "redisSessionConnectionFactory"})
   public RedisConnectionFactory redisSessionConnectionFactory() {
     RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-    redisStandaloneConfiguration.setHostName(host);
-    redisStandaloneConfiguration.setPort(redisSessionPort);
+    redisStandaloneConfiguration.setHostName(sessionHost);
+    redisStandaloneConfiguration.setPort(sessionPort);
 
     LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
         redisStandaloneConfiguration);
@@ -90,8 +93,8 @@ public class RedisConfiguration {
   @Bean
   public RedisConnectionFactory redisCacheConnectionFactory() {
     RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-    redisStandaloneConfiguration.setHostName(host);
-    redisStandaloneConfiguration.setPort(port);
+    redisStandaloneConfiguration.setHostName(cacheHost);
+    redisStandaloneConfiguration.setPort(cachePost);
     LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
         redisStandaloneConfiguration);
 
