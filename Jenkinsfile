@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools {
+      gradle 'Gradle 7.2'
+    }
     options {
         timeout(time: 1, unit: 'HOURS')
     }
@@ -9,6 +12,7 @@ pipeline {
         RELEASE_BRANCH = 'develop'
     }
     stages {
+
 
         stage('clone') {
             steps {
@@ -23,11 +27,10 @@ pipeline {
             steps {
                 sh "pwd"
 
-                sh "gradle clean"
-                sh "gradle bootJar"
+                sh "gradle clean build -s"
 
                 sh "docker build -t ed ."
-                }
+
             }
         }
 
