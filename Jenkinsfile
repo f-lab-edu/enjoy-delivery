@@ -30,13 +30,11 @@ pipeline {
         stage('backend dockerizing') {
             steps {
                 sh "pwd"
-                dir("./enjoydelivery-springboot3-webservice"){
-                    sh "pwd"
+                
+                sh "gradle clean"
+                sh "gradle bootJar"
 
-                    sh "gradle clean"
-                    sh "gradle bootJar"
-
-                    sh "docker build -t ed ."
+                sh "docker build -t ed ."
                 }
             }
         }
