@@ -9,14 +9,6 @@ pipeline {
         RELEASE_BRANCH = 'develop'
     }
     stages {
-        stage('Init') {
-            steps {
-                echo 'clear'
-                sh 'docker stop $(docker ps -aq)'
-                sh 'docker rm $(docker ps -aq)'
-                deleteDir()
-            }
-        }
 
         stage('clone') {
             steps {
@@ -30,7 +22,7 @@ pipeline {
         stage('backend dockerizing') {
             steps {
                 sh "pwd"
-                
+
                 sh "gradle clean"
                 sh "gradle bootJar"
 
