@@ -38,7 +38,7 @@ pipeline {
 
         stage('deploy') {
             steps {
-                sh "docker run -d -p 8080:8080 ed --name edcontainer"
+                sh "docker run -d -p 8080:8080 ed"
             }
         }
     }
