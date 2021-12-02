@@ -12,7 +12,7 @@ def ssh_publisher(SERVER_CONFIG) {
                         remoteDirectory: "project"
                     ),
                     sshTransfer(
-                        execCommand: "chmod +x /project/deploy.sh && sh /project/deploy.sh"
+                        execCommand: "chmod +x /project/deploy.sh && JENKINS_NODE_COOKIE=dontKillMe && sh /project/deploy.sh"
                     )
                 ]
             )
