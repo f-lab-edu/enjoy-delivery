@@ -29,7 +29,7 @@ pipeline {
         SOURCECODE_JENKINS_CREDENTIAL_ID = 'meme2367'
         SOURCE_CODE_URL = 'https://github.com/f-lab-edu/enjoy-delivery/'
         RELEASE_BRANCH = 'develop'
-        SERVER_LIST = 'ncloud-server1, ncloud-server2'
+        SERVER_LIST = 'ncloud-server1,ncloud-server2'
     }
     stages {
         stage('clone') {
