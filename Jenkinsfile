@@ -21,25 +21,39 @@ pipeline {
             }
         }
 
-        stage('init') {
-                    steps {
-                        echo 'clear'
-                        sh 'docker stop $(docker ps -aq)'
-                        sh 'docker rm $(docker ps -aq)'
-                    }
-        }
-        stage('backend dockerizing') {
+
+        stage('backend build') {
             steps {
                 sh "pwd"
                 sh "gradle clean build -s"
-                sh "docker build -t ed ."
             }
         }
 
-        stage('deploy') {
+        stage('SSH transfer') {
             steps {
-                sh "docker run -d -p 8080:8080 ed"
+                sshPublisher(
+                continueOnError: false, failOnError: true,
+                publishers: [
+                    sshPublisherDesc(
+                     configName: "ncloud-server1",
+                     verbose: true,
+                     transfers: [
+                        sshTransfer(
+                        sourceFiles: "build/libs/enjoy-delivery.jar, deploy.sh",
+                        remoteDirectory: "project"
+                        )
+                    ])
+                ])
             }
         }
+
+        stage('server deploy') {
+            steps {
+                sh "chmod +x ./deploy.sh"
+                sh "./deploy.sh"
+            }
+        }
+
+
     }
 }
