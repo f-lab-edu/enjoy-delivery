@@ -45,7 +45,9 @@ pipeline {
         stage('backend build') {
             steps {
                 sh "pwd"
-                sh "gradle clean build -s"
+                sh "gradle clean test"
+                echo "build.."
+                sh "gradle build -s"
             }
         }
 
