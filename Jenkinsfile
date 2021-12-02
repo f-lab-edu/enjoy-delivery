@@ -10,9 +10,6 @@ def ssh_publisher(SERVER_CONFIG) {
                     sshTransfer(
                         sourceFiles: "build/libs/enjoy-delivery.jar, deploy.sh",
                         remoteDirectory: "project"
-                    ),
-                    sshTransfer(
-                        execCommand: "chmod +x /project/deploy.sh && sh /project/deploy.sh"
                     )
                 ]
             )
@@ -61,6 +58,8 @@ pipeline {
                 SERVER_LIST.tokenize(',').each {
                   echo "SERVER: ${it}"
                   ssh_publisher("${it}")
+                  sh "chmod +x ./deploy.sh"
+                  sh "./deploy.sh"
                 }
               }
             }
