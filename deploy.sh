@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPOSITORY=build/libs
+REPOSITORY=/project/build/libs
 PROJECT_NAME=enjoy-delivery
 
 echo "> 현재 구동중인 애플리케이션 pid 확인"

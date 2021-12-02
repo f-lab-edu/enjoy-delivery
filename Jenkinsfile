@@ -1,3 +1,25 @@
+def ssh_publisher(SERVER_CONFIG) {
+    sshPublisher(
+        continueOnError: false,
+        failOnError: true,
+        publishers:[
+            sshPublisherDesc(
+                configName: "${SERVER_CONFIG}",
+                verbose: true,
+                transfers: [
+                    sshTransfer(
+                        sourceFiles: "build/libs/enjoy-delivery.jar, deploy.sh",
+                        remoteDirectory: "project"
+                    ),
+                    sshTransfer(
+                        execCommand: "chmod +x /project/deploy.sh && sh /project/deploy.sh"
+                    )
+                ]
+            )
+        ]
+    )
+}
+
 pipeline {
     agent any
     tools {
@@ -10,6 +32,7 @@ pipeline {
         SOURCECODE_JENKINS_CREDENTIAL_ID = 'meme2367'
         SOURCE_CODE_URL = 'https://github.com/f-lab-edu/enjoy-delivery/'
         RELEASE_BRANCH = 'develop'
+        SERVER_LIST = 'ncloud-server1, ncloud-server2'
     }
     stages {
         stage('clone') {
@@ -29,31 +52,18 @@ pipeline {
             }
         }
 
-        stage('SSH transfer') {
-            steps {
-                sshPublisher(
-                continueOnError: false, failOnError: true,
-                publishers: [
-                    sshPublisherDesc(
-                     configName: "ncloud-server1",
-                     verbose: true,
-                     transfers: [
-                        sshTransfer(
-                        sourceFiles: "build/libs/enjoy-delivery.jar, deploy.sh",
-                        remoteDirectory: "project"
-                        )
-                    ])
-                ])
-            }
-        }
-
         stage('server deploy') {
             steps {
-                sh "chmod +x ./deploy.sh"
-                sh "./deploy.sh"
+              echo "deploy.."
+              echo "${SERVER_LIST}"
+
+              script {
+                SERVER_LIST.tokenize(',').each {
+                  echo "SERVER: ${it}"
+                  ssh_publisher("${it}")
+                }
+              }
             }
         }
-
-
     }
 }
