@@ -12,8 +12,6 @@ pipeline {
         RELEASE_BRANCH = 'develop'
     }
     stages {
-
-
         stage('clone') {
             steps {
                 git url: "$SOURCE_CODE_URL",
@@ -23,20 +21,24 @@ pipeline {
             }
         }
 
+        stage('init') {
+                    steps {
+                        echo 'clear'
+                        sh 'docker stop $(docker ps -aq)'
+                        sh 'docker rm $(docker ps -aq)'
+                    }
+        }
         stage('backend dockerizing') {
             steps {
                 sh "pwd"
-
                 sh "gradle clean build -s"
-
                 sh "docker build -t ed ."
-
             }
         }
 
         stage('deploy') {
             steps {
-                sh "docker run -d -p 8080:8080 ed"
+                sh "docker run -d -p 8080:8080 ed --name edcontainer"
             }
         }
     }
