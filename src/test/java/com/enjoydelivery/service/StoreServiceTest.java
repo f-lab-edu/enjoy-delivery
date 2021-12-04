@@ -39,7 +39,7 @@ public class StoreServiceTest {
   @Mock
   CategoryService categoryService;
 
-  public StoreRequestDTO makeStoreRequestDTO() {
+  public static StoreRequestDTO makeStoreRequestDTO() {
     return new StoreRequestDTO(
         "00010030",
         "가게이름" ,
@@ -56,7 +56,7 @@ public class StoreServiceTest {
   }
 
 
-  public StoreRequestDTO makeUpdateStoreReqeustDTO() {
+  public static StoreRequestDTO makeUpdateStoreReqeustDTO() {
     return new StoreRequestDTO(
         "00010031",//update
         "수정된가게이름" ,//update
@@ -72,18 +72,18 @@ public class StoreServiceTest {
     );
   }
 
-  public Store makeStore() {
+  public static Store makeStore() {
     return makeStore(makeStoreRequestDTO());
   }
 
-  public Store makeStore(StoreRequestDTO storeRequestDTO) {
+  public static Store makeStore(StoreRequestDTO storeRequestDTO) {
     Store store = storeRequestDTO.toEntity();
     store.setId(1L);
     return store;
   }
 
 
-  public Menu makeMenu() {
+  public static Menu makeMenu() {
     return Menu.builder()
         .id(1L)
         .name("menu")
@@ -95,14 +95,14 @@ public class StoreServiceTest {
         .build();
   }
 
-  public Category makeCategory() {
+  public static Category makeCategory() {
     return Category.builder()
         .id(1L)
         .name("일식")
         .build();
   }
 
-  public Owner makeOwner() {
+  public static Owner makeOwner() {
     return Owner.builder()
         .id(1L)
         .uid("uid")
