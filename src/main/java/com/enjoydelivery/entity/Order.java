@@ -15,7 +15,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import lombok.Builder;
+import lombok.Getter;
 
+@Getter
+@Builder
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -44,4 +48,16 @@ public class Order {
 
   @OneToMany(mappedBy = "order")
   private List<OrderItem> orderItems;
+
+  public void cancel() {
+    this.orderState = OrderState.주문취소;
+  }
+
+  public boolean isCanceled() {
+    return this.orderState == OrderState.주문취소;
+  }
+
+  public boolean isCompleted() {
+    return this.orderState == OrderState.주문완료;
+  }
 }
