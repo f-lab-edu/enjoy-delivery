@@ -36,7 +36,7 @@ public class CartServiceTest {
   @InjectMocks
   CartService cartService;
 
-  public CreateOrderItemRequestDTO makeCreateOrderItemRequestDTO() {
+  public static CreateOrderItemRequestDTO makeCreateOrderItemRequestDTO() {
     return new CreateOrderItemRequestDTO(
         1L,
         1L,
@@ -44,21 +44,21 @@ public class CartServiceTest {
         3);
   }
 
-  public ReadMenuResponseDTO makeReadMenuResponseDTO() {
+  public static ReadMenuResponseDTO makeReadMenuResponseDTO() {
     return new ReadMenuResponseDTO(
         1L,
         "엽기떡볶이",
         17000);
   }
 
-  public OrderItem makeOrderItem() {
+  public static OrderItem makeOrderItem() {
     return makeOrderItem(makeCreateOrderItemRequestDTO());
   }
 
-  public OrderItem makeOrderItem(CreateOrderItemRequestDTO createOrderItemRequestDTO) {
+  public static OrderItem makeOrderItem(CreateOrderItemRequestDTO createOrderItemRequestDTO) {
     return createOrderItemRequestDTO.toEntity();
   }
-  public StoreRequestDTO makeStoreRequestDTO() {
+  public static StoreRequestDTO makeStoreRequestDTO() {
     return new StoreRequestDTO(
         "00010030",
         "가게이름" ,
@@ -74,11 +74,11 @@ public class CartServiceTest {
     );
   }
 
-  public Store makeStore() {
+  public static Store makeStore() {
     return makeStore(makeStoreRequestDTO());
   }
 
-  public Store makeStore(StoreRequestDTO storeRequestDTO) {
+  public static Store makeStore(StoreRequestDTO storeRequestDTO) {
     Store store = storeRequestDTO.toEntity();
     store.setId(1L);
     return store;
