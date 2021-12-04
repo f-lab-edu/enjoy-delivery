@@ -54,4 +54,8 @@ public class MenuService {
     Menu menu = readOneById(menuId);
     menu.updateDeleteState();
   }
+
+  public List<Menu> readAllByIds(List<Long> menuIds) {
+    return menuRepository.findAllByIdIn(menuIds);
+  }
 }
