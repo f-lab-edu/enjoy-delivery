@@ -2,7 +2,11 @@ package com.enjoydelivery.controller;
 
 import com.enjoydelivery.dto.cart.request.CreateOrderItemRequestDTO;
 import com.enjoydelivery.dto.cart.response.ReadCartResponseDTO;
+import com.enjoydelivery.entity.UserInfo;
+import com.enjoydelivery.entity.UserType;
+import com.enjoydelivery.exception.ForbiddenException;
 import com.enjoydelivery.service.CartService;
+import com.enjoydelivery.service.LoginService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,28 +25,49 @@ import org.springframework.web.bind.annotation.RestController;
 public class CartController {
 
   private final CartService cartService;
+  private final LoginService loginService;
 
   @PostMapping
   public ResponseEntity addOrderItem(@RequestBody @Valid CreateOrderItemRequestDTO orderItemCommand) {
-    cartService.addOrderItem(orderItemCommand);
+
+    UserInfo userInfo = loginService.getCurrentUserInfo();
+    Long userId = userInfo.getId();
+    if (!userInfo.getUserType().equals(UserType.USER)) {
+      throw new ForbiddenException();
+    }
+    cartService.addOrderItem(orderItemCommand, userId);
     return new ResponseEntity(HttpStatus.OK);
   }
 
-  @GetMapping("/{userId}")
-  public ResponseEntity read(@PathVariable("userId") @Valid Long userId) {
+  @GetMapping
+  public ResponseEntity read() {
+    UserInfo userInfo = loginService.getCurrentUserInfo();
+    Long userId = userInfo.getId();
+    if (!userInfo.getUserType().equals(UserType.USER)) {
+      throw new ForbiddenException();
+    }
     ReadCartResponseDTO readCartResponseDTO = cartService.read(userId);
     return new ResponseEntity(readCartResponseDTO, HttpStatus.OK);
   }
 
-  @DeleteMapping("/{menuId}/{userId}")
-  public ResponseEntity deleteOneOrderItem(@PathVariable("menuId") @Valid Long menuId,
-      @PathVariable("userId") @Valid Long userId) {
+  @DeleteMapping("/{menuId}")
+  public ResponseEntity deleteOneOrderItem(@PathVariable("menuId") @Valid Long menuId) {
+    UserInfo userInfo = loginService.getCurrentUserInfo();
+    Long userId = userInfo.getId();
+    if (!userInfo.getUserType().equals(UserType.USER)) {
+      throw new ForbiddenException();
+    }
     cartService.deleteOneOrderItem(menuId, userId);
     return new ResponseEntity(HttpStatus.OK);
   }
 
-  @DeleteMapping("/{userId}")
-  public ResponseEntity deleteAll(@PathVariable("userId") @Valid Long userId) {
+  @DeleteMapping()
+  public ResponseEntity deleteAll() {
+    UserInfo userInfo = loginService.getCurrentUserInfo();
+    Long userId = userInfo.getId();
+    if (!userInfo.getUserType().equals(UserType.USER)) {
+      throw new ForbiddenException();
+    }
     cartService.deleteAll(userId);
     return new ResponseEntity(HttpStatus.OK);
   }

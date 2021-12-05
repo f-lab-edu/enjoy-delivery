@@ -39,7 +39,6 @@ public class CartServiceTest {
   public static CreateOrderItemRequestDTO makeCreateOrderItemRequestDTO() {
     return new CreateOrderItemRequestDTO(
         1L,
-        1L,
         makeReadMenuResponseDTO(),
         3);
   }
@@ -93,7 +92,7 @@ public class CartServiceTest {
         = makeCreateOrderItemRequestDTO();
 
     OrderItem orderItem = makeOrderItem(createOrderItemRequestDTO);
-    Long userId = createOrderItemRequestDTO.getUserId();
+    Long userId = 1L;
     Long storeId = createOrderItemRequestDTO.getStoreId();
 
     doReturn(0L)
@@ -101,7 +100,7 @@ public class CartServiceTest {
         .findStoreIdByUserId(userId);
 
     // Act
-    cartService.addOrderItem(createOrderItemRequestDTO);
+    cartService.addOrderItem(createOrderItemRequestDTO, userId);
 
     // Assert
     verify(cartDAO, times(1))
@@ -122,7 +121,7 @@ public class CartServiceTest {
         = makeCreateOrderItemRequestDTO();
 
     OrderItem orderItem = makeOrderItem(createOrderItemRequestDTO);
-    Long userId = createOrderItemRequestDTO.getUserId();
+    Long userId = 1L;
     Long storeId = createOrderItemRequestDTO.getStoreId();
     Long menuId = orderItem.getMenu().getId();
 
@@ -135,7 +134,7 @@ public class CartServiceTest {
         .existOrderItem(menuId, userId);
 
     // Act, Assert
-    cartService.addOrderItem(createOrderItemRequestDTO);
+    cartService.addOrderItem(createOrderItemRequestDTO, userId);
 
     assertThat(cartService.isEmptyCart(storeId))
         .isFalse();
@@ -160,7 +159,7 @@ public class CartServiceTest {
         = makeCreateOrderItemRequestDTO();
 
     OrderItem orderItem = makeOrderItem(createOrderItemRequestDTO);
-    Long userId = createOrderItemRequestDTO.getUserId();
+    Long userId = 1L;
     Long storeId = createOrderItemRequestDTO.getStoreId();
     Long otherStoreId = 10L;
 
@@ -170,7 +169,7 @@ public class CartServiceTest {
 
     // Act, Assert
     assertThatThrownBy(() -> {
-      cartService.addOrderItem(createOrderItemRequestDTO);
+      cartService.addOrderItem(createOrderItemRequestDTO, userId);
     }).isInstanceOf(RuntimeException.class)
         .hasMessage(CartService.EXCEPTION_INVALID_STORE_ID);
 
@@ -193,7 +192,7 @@ public class CartServiceTest {
         = makeCreateOrderItemRequestDTO();
 
     OrderItem orderItem = makeOrderItem(createOrderItemRequestDTO);
-    Long userId = createOrderItemRequestDTO.getUserId();
+    Long userId = 1L;
     Long storeId = createOrderItemRequestDTO.getStoreId();
     Long menuId = orderItem.getMenu().getId();
 
@@ -207,7 +206,7 @@ public class CartServiceTest {
 
     // Act, Assert
     assertThatThrownBy(() -> {
-      cartService.addOrderItem(createOrderItemRequestDTO);
+      cartService.addOrderItem(createOrderItemRequestDTO, userId);
     }).isInstanceOf(RuntimeException.class)
         .hasMessage(CartService.EXCEPTION_DUPLICATE_MENU);
 
