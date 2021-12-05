@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
   List<Menu> findAllByStore_id(Long storeId);
+
+  List<Menu> findAllByIdIn(List<Long> menuIds);
 }
