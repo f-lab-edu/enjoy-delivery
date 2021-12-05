@@ -58,8 +58,4 @@ public class Menu {
     this.menuState = MenuState.DELETED;
   }
 
-  public void setStore(Store store) {
-    this.store = store;
-    store.getMenus().add(this);
-  }
 }

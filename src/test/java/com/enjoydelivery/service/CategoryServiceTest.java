@@ -30,21 +30,21 @@ public class CategoryServiceTest {
   @Mock
   CategoryRepository categoryRepository;
 
-  public Category makeCategory() {
+  public static Category makeCategory() {
     return makeCategory(makeCategoryRequestDTO());
   }
 
-  public Category makeCategory(CategoryRequestDTO categoryRequestDTO) {
+  public static Category makeCategory(CategoryRequestDTO categoryRequestDTO) {
     Category category = categoryRequestDTO.toEntity();
     category.setId(1L);
     return category;
   }
 
-  public CategoryRequestDTO makeCategoryRequestDTO() {
+  public static CategoryRequestDTO makeCategoryRequestDTO() {
     return new CategoryRequestDTO("중식");
   }
 
-  public CategoryRequestDTO makeUpdateCategoryRequestDTO() {
+  public static CategoryRequestDTO makeUpdateCategoryRequestDTO() {
     return new CategoryRequestDTO("양식");
   }
 
