@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 public class CreateOrderItemRequestDTO {
 
   @NotNull
-  private Long userId;
-  @NotNull
   private Long storeId;
   @NotNull
   private ReadMenuResponseDTO readMenuResponseDTO;

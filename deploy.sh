@@ -23,4 +23,4 @@ JAR_NAME=$(ls $REPOSITORY | grep ${PROJECT_NAME} | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
+java -jar $REPOSITORY/$JAR_NAME 2>&1 &

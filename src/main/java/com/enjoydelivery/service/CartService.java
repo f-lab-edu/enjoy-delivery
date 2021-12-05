@@ -22,10 +22,9 @@ public class CartService {
   private final StoreService storeService;
   private final CartDAO cartDAO;
 
-  public void addOrderItem(CreateOrderItemRequestDTO orderItemCommand) {
+  public void addOrderItem(CreateOrderItemRequestDTO orderItemCommand, Long userId) {
     OrderItem orderItem = orderItemCommand.toEntity();
     Long storeId = orderItemCommand.getStoreId();
-    Long userId = orderItemCommand.getUserId();
     Long menuId = orderItem.getMenu().getId();
 
     Long findStoreId = cartDAO.findStoreIdByUserId(userId);
