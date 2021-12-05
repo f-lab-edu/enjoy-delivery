@@ -1,4 +1,5 @@
 #!/bin/bash
+#java -jar build/libs/enjoy-delivery.jar
 
 REPOSITORY=build/libs
 PROJECT_NAME=enjoy-delivery
@@ -23,4 +24,4 @@ JAR_NAME=$(ls $REPOSITORY | grep ${PROJECT_NAME} | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
-java -jar $REPOSITORY/$JAR_NAME 2>&1 &
+nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
