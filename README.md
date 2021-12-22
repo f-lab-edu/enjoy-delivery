@@ -28,7 +28,7 @@ Spring boot, Java, Spring data JPA, Mysql, Redis, Jenkins, Github, naver cloud f
 * 스프링의 @Transactional을 이용하여 작업의 완전성 보장하기
 * Jenkins pipeline을 사용하여 CI/CD 환경 구축
 * 가게 데이터 조회 시 N+1문제 해결하기
-* 장바구니 조회 성능 최적화
+* Redis scan을 활용하여 장바구니 조회 성능 최적화
 * naver Cloud Platform을 이용하여 로드밸런싱
 * 새로운 스레드풀을 만들고 @Async를 이용하여 비동기 푸쉬 알람 서비스 구현(미완성)
 * Mysql Replication - Master/Slave 데이터 이중화 적용(미완성)
