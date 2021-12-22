@@ -1,44 +1,45 @@
-# enjoy-delivery
+## enjoy-delivery 서버 구조도
+![enjoy-delivery](https://user-images.githubusercontent.com/29730565/147025438-31c0bad7-c466-4b6d-b836-3b371b36dcdc.png)
+Spring boot, Java, Spring data JPA, Mysql, Redis, Jenkins, Github, naver cloud flatform, firebase
 
-## Stack
-- Spring boot 2
-- Java 11
-- Hibernate
-- Mysql
-- Redis
 
 ## 프로젝트 목표
+* 배달의 민족같은 배달 앱 서비스를 구현해 내는 것이 목표입니다.
+* 단순 기능 구현뿐 아니라 확장성 있는 서비스를 구현하는 것이 목표입니다.
+* 객체지향 원리와 Ioc/DI, Fetch join을 적용함으로써 더 나은 코드를 작성하는 것이 목표입니다.
+* 스터디와 코드 리뷰, 페어프로그래밍을 통해 함께 자라기가 목표입니다.
 
-- 단순한 기능 구현뿐 아니라 대용량 트래픽 처리까지 고려한 기능을 구현하는 것이 목표입니다.
-- scalability ( 확장성) 있는 아키텍쳐
-- 전략패턴, 객체지향 설계 원칙, DI, AOP,  함수형 프로그래밍, TDD 등을 적용하여 변경에 용이한 코드를 만드를 작성하는 것이 목표입니다.
-- 꾸준한 스터디와 코드 리뷰를 통해 모두가 성장하고자 합니다.
+## 기술적 issue 해결 과정
+* [ EnjoyDelivery  이슈 1. 가게 데이터 조회 시 N+1문제 해결하기 - Fetch join, @EntityGraph](https://velog.io/@meme2367/EnjoyDelivery-%EC%9D%B4%EC%8A%88-1.-%EA%B0%80%EA%B2%8C-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%A1%B0%ED%9A%8C-%EC%8B%9C-N1%EB%AC%B8%EC%A0%9C-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0-Fetch-join-EntityGraph)
 
-## 중점 사항
+* [ EnjoyDelivery  이슈 2. 장바구니 메뉴 조회 시 redis의 O(N) 명령어를 O(1) 명령어로 변경](https://velog.io/@meme2367/EnjoyDelivery-%EC%9D%B4%EC%8A%88-3.-%EC%9E%A5%EB%B0%94%EA%B5%AC%EB%8B%88-%EA%B8%B0%EB%8A%A5%EC%97%90-Redis-ON-%EB%AA%85%EB%A0%B9%EC%96%B4%EB%A5%BC-O1-%EB%AA%85%EB%A0%B9%EC%96%B4%EB%A1%9C-%EB%B3%80%EA%B2%BD)
 
-1. 우리가 사용하는 스택에 대한 실무적 활용 익히기(구현시 어떠한 어려움이 있는지 겪고 그 경험을 정리)
-    1. spring
-    2. JPA
-    3. Redis : 서버 부하를 줄이기 위해 캐싱 활용
-    4. DB 서버 부하 분산 : DB 이중화 ( Master, Slave ), 장애대응
-    5. CI/CD ( Jenkins, Docker ) 를 통해 쉽게 협업이 가능하고, 지속적인 개발이 가능한 프로젝트를 만들고자 합니다.
-    6. 테스트 자동화 - Junit, Mockito
-2. Scailibility ( 확장성 ) 있는 아키텍쳐
-3. 유지보수성 ( or 기능 확장성) 있는 프로젝트 구조
-4. DB 통신 최소화와 API 응답 시간 줄이기  : N+ 1 문제
-5. 트랜잭션 처리와 낙관적 락으로 데이터 무결성..? 만족시키기
-    1.  주문 취소, 결제 실패
-    2. 쿠폰이랑 같이 결제하기
-    3. 결제 실패로 장바구니 복원시키기
-6. 테스팅(유닛, 통합, 부하테스트)
-7. Git branch 전략
 
-### 마일스톤
+* [ EnjoyDelivery  이슈 3. 다중 서버에서 인증 정보는 어디에 저장할까 : Session Storage](https://velog.io/@meme2367/EnjoyDelivery-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%9D%98-%EC%9D%B4%EC%8A%88-3.-%EB%8B%A4%EC%A4%91-%EC%84%9C%EB%B2%84%EC%97%90%EC%84%9C-%EC%9D%B8%EC%A6%9D-%EC%A0%95%EB%B3%B4%EB%8A%94-%EC%96%B4%EB%94%94%EC%97%90-%EC%A0%80%EC%9E%A5%ED%95%A0%EA%B9%8C-Session-Storage)
 
-1. minimum(전단지앱): 가게 카테고리 목록 조회 + 가게 조회(거리순) + 메뉴 조회+  CI/CD + test
-2. 부가기능1: 유저, 사장님, 어드민 로그인 / 로그아웃 + 유저 결제 + 가게 관리(정보,주문관리) + 주문기록 조회 + 주문
-3. 부가기능2: 장바구니
-4. 부가기능3: 쿠폰결제
-5. 최적화기능 :  알림 , 검색 기능
+* [ EnjoyDelivery  이슈 4. 다중 서버에서의 CI / CD : Jenkins Pipeline](https://velog.io/@meme2367/EnjoyDelivery-%EC%9D%B4%EC%8A%88-4.-%EB%8B%A4%EC%A4%91-%EC%84%9C%EB%B2%84%EC%97%90%EC%84%9C%EC%9D%98-CI-CD)
 
-> More information will be documented later on.
+
+## 프로젝트 중점사항
+* 서버의 확장성
+* 의존적이지 않은 단위테스트 작성
+* 다중 서버 환경에서 Session Storage 활용한 인증 구현
+* Redis Cache를 이용해 장바구니 기능 구현
+* 스프링의 @Transactional을 이용하여 작업의 완전성 보장하기
+* 스프링의 @Transactional을 이용하여 작업의 완전성 보장하기
+* Jenkins pipeline을 사용하여 CI/CD 환경 구축
+* 스프링의 @Transactional을 이용하여 작업의 완전성 보장하기
+* 가게 데이터 조회 시 N+1문제 해결하기
+* 장바구니 조회 성능 최적화
+* naver Cloud Platform을 이용하여 로드밸런싱
+* 새로운 스레드풀을 만들고 @Async를 이용하여 비동기 푸쉬 알람 서비스 구현(미완성)
+* Mysql Replication - Master/Slave 데이터 이중화 적용(미완성)
+* Ngrinder를 이용하여 connection pool 테스트(미완성)
+
+
+## DB ERD
+
+## Class Diagram
+
+## Front
+
