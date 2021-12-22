@@ -26,9 +26,7 @@ Spring boot, Java, Spring data JPA, Mysql, Redis, Jenkins, Github, naver cloud f
 * 다중 서버 환경에서 Session Storage 활용한 인증 구현
 * Redis Cache를 이용해 장바구니 기능 구현
 * 스프링의 @Transactional을 이용하여 작업의 완전성 보장하기
-* 스프링의 @Transactional을 이용하여 작업의 완전성 보장하기
 * Jenkins pipeline을 사용하여 CI/CD 환경 구축
-* 스프링의 @Transactional을 이용하여 작업의 완전성 보장하기
 * 가게 데이터 조회 시 N+1문제 해결하기
 * 장바구니 조회 성능 최적화
 * naver Cloud Platform을 이용하여 로드밸런싱
