@@ -36,29 +36,28 @@ public class CartServiceTest {
   @InjectMocks
   CartService cartService;
 
-  public CreateOrderItemRequestDTO makeCreateOrderItemRequestDTO() {
+  public static CreateOrderItemRequestDTO makeCreateOrderItemRequestDTO() {
     return new CreateOrderItemRequestDTO(
-        1L,
         1L,
         makeReadMenuResponseDTO(),
         3);
   }
 
-  public ReadMenuResponseDTO makeReadMenuResponseDTO() {
+  public static ReadMenuResponseDTO makeReadMenuResponseDTO() {
     return new ReadMenuResponseDTO(
         1L,
         "엽기떡볶이",
         17000);
   }
 
-  public OrderItem makeOrderItem() {
+  public static OrderItem makeOrderItem() {
     return makeOrderItem(makeCreateOrderItemRequestDTO());
   }
 
-  public OrderItem makeOrderItem(CreateOrderItemRequestDTO createOrderItemRequestDTO) {
+  public static OrderItem makeOrderItem(CreateOrderItemRequestDTO createOrderItemRequestDTO) {
     return createOrderItemRequestDTO.toEntity();
   }
-  public StoreRequestDTO makeStoreRequestDTO() {
+  public static StoreRequestDTO makeStoreRequestDTO() {
     return new StoreRequestDTO(
         "00010030",
         "가게이름" ,
@@ -74,11 +73,11 @@ public class CartServiceTest {
     );
   }
 
-  public Store makeStore() {
+  public static Store makeStore() {
     return makeStore(makeStoreRequestDTO());
   }
 
-  public Store makeStore(StoreRequestDTO storeRequestDTO) {
+  public static Store makeStore(StoreRequestDTO storeRequestDTO) {
     Store store = storeRequestDTO.toEntity();
     store.setId(1L);
     return store;
@@ -93,7 +92,7 @@ public class CartServiceTest {
         = makeCreateOrderItemRequestDTO();
 
     OrderItem orderItem = makeOrderItem(createOrderItemRequestDTO);
-    Long userId = createOrderItemRequestDTO.getUserId();
+    Long userId = 1L;
     Long storeId = createOrderItemRequestDTO.getStoreId();
 
     doReturn(0L)
@@ -101,7 +100,7 @@ public class CartServiceTest {
         .findStoreIdByUserId(userId);
 
     // Act
-    cartService.addOrderItem(createOrderItemRequestDTO);
+    cartService.addOrderItem(createOrderItemRequestDTO, userId);
 
     // Assert
     verify(cartDAO, times(1))
@@ -122,7 +121,7 @@ public class CartServiceTest {
         = makeCreateOrderItemRequestDTO();
 
     OrderItem orderItem = makeOrderItem(createOrderItemRequestDTO);
-    Long userId = createOrderItemRequestDTO.getUserId();
+    Long userId = 1L;
     Long storeId = createOrderItemRequestDTO.getStoreId();
     Long menuId = orderItem.getMenu().getId();
 
@@ -135,7 +134,7 @@ public class CartServiceTest {
         .existOrderItem(menuId, userId);
 
     // Act, Assert
-    cartService.addOrderItem(createOrderItemRequestDTO);
+    cartService.addOrderItem(createOrderItemRequestDTO, userId);
 
     assertThat(cartService.isEmptyCart(storeId))
         .isFalse();
@@ -160,7 +159,7 @@ public class CartServiceTest {
         = makeCreateOrderItemRequestDTO();
 
     OrderItem orderItem = makeOrderItem(createOrderItemRequestDTO);
-    Long userId = createOrderItemRequestDTO.getUserId();
+    Long userId = 1L;
     Long storeId = createOrderItemRequestDTO.getStoreId();
     Long otherStoreId = 10L;
 
@@ -170,7 +169,7 @@ public class CartServiceTest {
 
     // Act, Assert
     assertThatThrownBy(() -> {
-      cartService.addOrderItem(createOrderItemRequestDTO);
+      cartService.addOrderItem(createOrderItemRequestDTO, userId);
     }).isInstanceOf(RuntimeException.class)
         .hasMessage(CartService.EXCEPTION_INVALID_STORE_ID);
 
@@ -193,7 +192,7 @@ public class CartServiceTest {
         = makeCreateOrderItemRequestDTO();
 
     OrderItem orderItem = makeOrderItem(createOrderItemRequestDTO);
-    Long userId = createOrderItemRequestDTO.getUserId();
+    Long userId = 1L;
     Long storeId = createOrderItemRequestDTO.getStoreId();
     Long menuId = orderItem.getMenu().getId();
 
@@ -207,7 +206,7 @@ public class CartServiceTest {
 
     // Act, Assert
     assertThatThrownBy(() -> {
-      cartService.addOrderItem(createOrderItemRequestDTO);
+      cartService.addOrderItem(createOrderItemRequestDTO, userId);
     }).isInstanceOf(RuntimeException.class)
         .hasMessage(CartService.EXCEPTION_DUPLICATE_MENU);
 
