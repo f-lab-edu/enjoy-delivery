@@ -1,5 +1,5 @@
 ## enjoy-delivery 서버 구조도
-![enjoy-delivery](https://user-images.githubusercontent.com/29730565/147025438-31c0bad7-c466-4b6d-b836-3b371b36dcdc.png)
+![enjoy-delivery](https://user-images.githubusercontent.com/29730565/147661666-5d45008e-5bbc-45f4-a972-2cab0a3b16cc.png)
 Spring boot, Java, Spring data JPA, Mysql, Redis, Jenkins, Github, naver cloud flatform, firebase
 
 
