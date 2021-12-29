@@ -40,7 +40,6 @@ Spring boot, Java, Spring data JPA, Mysql, Redis, Jenkins, Github, naver cloud f
 
 ## Class Diagram
 [Class Diagram](https://docs.google.com/drawings/d/1suDxcRRapPoOE-QfeVfK9RY4N22PFhHc48r1zvpmt_g/edit?usp=sharing)
-![Class Diagram](https://user-images.githubusercontent.com/29730565/147659117-ef71c328-34b0-4e08-8085-0dbff46de50b.png)
 
 ## Front
 [Front - OvenApp](https://ovenapp.io/view/18hUuygmwXzLzkBFj5lWZle9cKhoW6i9/)
