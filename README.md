@@ -31,8 +31,6 @@ Spring boot, Java, Spring data JPA, Mysql, Redis, Jenkins, Github, naver cloud f
 * Jenkins pipeline을 사용하여 CI/CD 환경 구축
 * Redis scan을 활용하여 장바구니 조회 성능 최적화
 * naver Cloud Platform을 이용하여 로드밸런싱
-* Mysql Replication - Master/Slave 데이터 이중화 적용(미완성)
-* Ngrinder를 이용하여 connection pool 테스트(미완성)
 
 
 ## DB ERD
