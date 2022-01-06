@@ -79,31 +79,7 @@ public class OrderService {
         .setNotification(notification)
         .build();
 
-    try {
-      pushService.sendMessage(message);
-    } catch (RejectedExecutionException re) {//대기큐가 가득차면 발생하는 에러
-      waitAndResendOrderMessage(message, 1);
-    }
-  }
-
-
-  private void waitAndResendOrderMessage(Message message, int count) {
-    if (count > RETRY_COUNT_LIMIT) {
-      throw new QueueFullException();
-    }
-
-    try {
-      Thread.sleep(1000);//1초간 실행 -> waiting 일시정지 상태가 됨.
-    } catch (InterruptedException ie) {
-      //지정한 시간이 다되거나 interrupt가 호출되면 interruptedException 발생
-      Thread.currentThread().interrupt();//waiting -> runnable
-    }
-
-    try {
-      pushService.sendMessage(message);
-    } catch (RejectedExecutionException re) {
-      waitAndResendOrderMessage(message, count++);
-    }
+    pushService.sendMessage(message);
 
   }
 
