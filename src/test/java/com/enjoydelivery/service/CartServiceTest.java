@@ -34,7 +34,7 @@ public class CartServiceTest {
   StoreService storeService;
 
   @InjectMocks
-  CartService cartService;
+  CartService sut;
 
   public static CreateOrderItemRequestDTO makeCreateOrderItemRequestDTO() {
     return new CreateOrderItemRequestDTO(
@@ -85,7 +85,7 @@ public class CartServiceTest {
 
   @Test
   @DisplayName("장바구니가 비어있을 때에는 메뉴를 추가할 수 있다.")
-  void addOrderItemSuccess() {
+  void sut_add_order_item_when_empty_cart() {
 
     // Arrange
     CreateOrderItemRequestDTO createOrderItemRequestDTO
@@ -100,7 +100,7 @@ public class CartServiceTest {
         .findStoreIdByUserId(userId);
 
     // Act
-    cartService.addOrderItem(createOrderItemRequestDTO, userId);
+    sut.addOrderItem(createOrderItemRequestDTO, userId);
 
     // Assert
     verify(cartDAO, times(1))
@@ -114,8 +114,8 @@ public class CartServiceTest {
   }
 
   @Test
-  @DisplayName("장바구니에 메뉴 넣기 성공 : 이미 장바구니가 채워져있는 경우")
-  void addOrderItemSuccess2() {
+  @DisplayName("동일한 가게의 장바구니에 메뉴가 있을 경우에 메뉴를 더 추가할 수 있다")
+  void sut_add_order_item_if_there_is_a_item_in_the_cart_of_the_same_store() {
     // Arrange
     CreateOrderItemRequestDTO createOrderItemRequestDTO
         = makeCreateOrderItemRequestDTO();
@@ -134,9 +134,9 @@ public class CartServiceTest {
         .existOrderItem(menuId, userId);
 
     // Act, Assert
-    cartService.addOrderItem(createOrderItemRequestDTO, userId);
+    sut.addOrderItem(createOrderItemRequestDTO, userId);
 
-    assertThat(cartService.isEmptyCart(storeId))
+    assertThat(sut.isEmptyCart(storeId))
         .isFalse();
 
     verify(cartDAO, times(1))
@@ -151,8 +151,8 @@ public class CartServiceTest {
 
   }
   @Test
-  @DisplayName("장바구니에 메뉴 넣기 실패 : 장바구니가 채워져있을 경우 같은 가게의 메뉴만 넣을 수 있다.")
-  void addOrderItemFail1() {
+  @DisplayName("다른 가게의 장바구니가 이미 존재할 경우 메뉴룰 넣을 수 없다")
+  void sut_failed_to_add_order_item_if_another_store_cart_already_exists() {
 
     // Arrange
     CreateOrderItemRequestDTO createOrderItemRequestDTO
@@ -169,14 +169,14 @@ public class CartServiceTest {
 
     // Act, Assert
     assertThatThrownBy(() -> {
-      cartService.addOrderItem(createOrderItemRequestDTO, userId);
+      sut.addOrderItem(createOrderItemRequestDTO, userId);
     }).isInstanceOf(RuntimeException.class)
         .hasMessage(CartService.EXCEPTION_INVALID_STORE_ID);
 
-    assertThat(cartService.isEmptyCart(otherStoreId))
+    assertThat(sut.isEmptyCart(otherStoreId))
         .isFalse();
 
-    assertThat(cartService.isSameStore(storeId, otherStoreId))
+    assertThat(sut.isSameStore(storeId, otherStoreId))
         .isFalse();
 
     verify(cartDAO, times(0))
@@ -185,8 +185,8 @@ public class CartServiceTest {
   }
 
   @Test
-  @DisplayName("장바구니에 메뉴 넣기 실패 : 장바구니에는 이미 담긴 메뉴를 다시 담을 수 없다. ")
-  void addOrderItemFail2() {
+  @DisplayName("장바구니에는 이미 담긴 메뉴를 다시 넣을 수 없다.")
+  void sut_failed_to_add_order_item_if_the_same_order_item_already_exists() {
     // Arrange
     CreateOrderItemRequestDTO createOrderItemRequestDTO
         = makeCreateOrderItemRequestDTO();
@@ -206,11 +206,11 @@ public class CartServiceTest {
 
     // Act, Assert
     assertThatThrownBy(() -> {
-      cartService.addOrderItem(createOrderItemRequestDTO, userId);
+      sut.addOrderItem(createOrderItemRequestDTO, userId);
     }).isInstanceOf(RuntimeException.class)
         .hasMessage(CartService.EXCEPTION_DUPLICATE_MENU);
 
-    assertThat(cartService.isEmptyCart(storeId))
+    assertThat(sut.isEmptyCart(storeId))
         .isFalse();
 
     verify(cartDAO, times(0))
@@ -220,7 +220,7 @@ public class CartServiceTest {
 
   @Test
   @DisplayName("장바구니 메뉴 조회 성공")
-  void readSuccess() {
+  void sut_read_cart_by_user_id() {
     // Arrange
     Long userId = 1L;
     List<OrderItem> orderItems = new ArrayList<>();
@@ -239,7 +239,7 @@ public class CartServiceTest {
 
     // Act
     ReadCartResponseDTO readCartResponseDTO
-        = cartService.read(userId);
+        = sut.read(userId);
 
     // Assert
     assertThat(readCartResponseDTO.getStoreId())
@@ -272,7 +272,7 @@ public class CartServiceTest {
 
   @Test
   @DisplayName("장바구니 메뉴 조회 실패 : 장바구니가 비어있음.")
-  void readFail1() {
+  void sut_failed_to_read_cart_when_empty_cart() {
     // Arrange
     Long userId = 1L;
     List<OrderItem> orderItems = new ArrayList<>();
@@ -288,7 +288,7 @@ public class CartServiceTest {
     // Act
     assertThatThrownBy(() -> {
       ReadCartResponseDTO readCartResponseDTO
-          = cartService.read(userId);
+          = sut.read(userId);
     }).isInstanceOf(RuntimeException.class)
         .hasMessage(CartService.EXCEPTION_EMPTY_CART);
 
